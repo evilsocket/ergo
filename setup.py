@@ -3,13 +3,16 @@ from ergo.version import __version__
 
 import os
 
-long_description = 'Ergo utilities and training framework.'
+try:
+    long_description = open( 'README.md', 'rt' ).read()
+except:
+    long_description = 'Ergo utilities and training framework.'
 
 setup( name                 = 'ergo',
        version              = __version__,
        description          = long_description,
        long_description     = long_description,
-       author               = 'Simone Margaritelli',
+       author               = "Simone 'evilsocket' Margaritelli",
        author_email         = 'evilsocket@gmail.com',
        url                  = 'http://www.github.com/evilsocket/ergo',
        packages             = find_packages(),
