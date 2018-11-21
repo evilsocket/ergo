@@ -13,7 +13,7 @@ ergo (from the Latin sentence *"Cogito ergo sum"*) is a tool that makes machine 
 
 #### Installation
 
-Requires python3 and pip3, to install (replace `tensorflow` with `tensorflow-gpu` in the `requirements.txt` file for GPU support):
+Requires `python3` and `pip3`, to install (replace `tensorflow` with `tensorflow-gpu` in the `requirements.txt` file for GPU support):
 
     sudo pip3 install -r requirements.txt
     python3 setup.py build
