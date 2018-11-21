@@ -28,19 +28,15 @@ Make sure you have [CUDA 9.0 and cuDNN 7.0 installed](https://medium.com/@zhanwe
 
 #### Usage
 
-Print available actions:
+Start by printing the available actions by running `ergo help`, you can also print the software version (ergo, keras 
+and tensorflow versions) and some hardware info with `ergo info` to verify your installation. 
 
-    ergo help
+Once ready, create a new project named `example`:
 
-Print the software version (ergo, keras and tensorflow versions) and some hardware info:
+    ergo new example
 
-    ergo info
-
-Create a new project:
-
-    ergo new project-name
-
-Customize the model creation logic in the `project-name/model.py` file:
+Inside the newly created `example` folder, there are two files: `model.py`, that you can change to customize the model 
+creation logic:
 
 ```python
 def build_model(is_train):  
@@ -68,7 +64,7 @@ def build_model(is_train):
     return model
 ```
 
-Customize the training logic in the `project-name/train.py` file:
+and `train.py`, to customize the training algorithm:
 
 ```python
 def train_model(model, dataset):
@@ -91,34 +87,32 @@ def train_model(model, dataset):
             callbacks = [earlyStop])
 ```
 
-Optimize a dataset (get unique rows and reuse 15% of the total samples, customize ratio with `--reuse-ratio` argument, customize output with `--output`):
+After defining the model structure and the training process, you can import a CSV dataset (first column must be the label) and start training using 2 GPUs:
 
-    ergo optimize-dataset /some/path/data.csv
+    ergo train example --dataset /some/path/data.csv --gpus 2
 
-Import a dataset (data format is csv, first column is the label) and start training (use `--test` and `--validation` optional arguments to size the datasets) using 2 GPUs:
+This will split the dataset into a train, validation and test sets (partitioned with the `--test` and `--validation` arguments) and start the training.
 
-    ergo train project-name --dataset /some/path/data.csv --gpus 2
+If you want to update a model and/or train it on already imported data, you can simply:
 
-Train with a previously imported dataset (and update the model) using all available GPUs (or CPU cores if no GPU support is found):
+    ergo train example --gpus 2
 
-    ergo train project-name
+Now it's time to visualize the model structure and how the the `accuracy` and `loss` metrics changed during training (requires `sudo apt-get install graphviz python3-tk`):
+    
+    ergo view example
 
-Remove the train, test and validation temporary datasets:
+Once you're done, you can remove the train, test and validation temporary datasets with:
 
-    ergo clean project-name
+    ergo clean example
 
-Display a model and its training history (requires `sudo apt-get install graphviz python3-tk`):
+To load the model and start a REST API for evaluation (can be customized with `--host`, `--port` and `--debug` options, default to `http://127.0.0.1:8080/?x=0.345,1.0,0.9,...`): 
 
-    ergo view project-name
-
-Load the model and start a REST API for evaluation (can be customized with `--host`, `--port` and `--debug` options, default to `http://127.0.0.1:8080/?x=0.345,1.0,0.9,...`): 
-
-    ergo serve project-name
+    ergo serve example
 
 Convert the Keras model to [fdeep](https://github.com/Dobiasd/frugally-deep) format:
 
-    ergo to-fdeep project-name
+    ergo to-fdeep example
 
 Reset the state of a project (**WARNING**: this will remove the datasets, the model files and all training statistics):
 
-    ergo clean project-name --all
+    ergo clean example --all
