@@ -91,12 +91,15 @@ class Project(object):
             log.debug("loading model from %s ...", self.model_path)
             with open(self.model_path, 'r') as fp:
                 self.model = model_from_yaml(fp.read())
+
+        else:
+            self.model = self.builder(True)
                 
         if os.path.exists(self.history_path):
             log.debug("loading history from %s ...", self.history_path)
             with open(self.history_path, 'r') as fp:
                 self.history = json.loads(fp.read())
-
+        
         return None
     
     def _accuracy_for(self, X, Y):
