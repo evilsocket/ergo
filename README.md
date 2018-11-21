@@ -4,10 +4,10 @@ ergo (from the Latin sentence *"Cogito ergo sum"*) is a tool that makes machine 
 
 **It can be used to**: 
 
-* Scaffold new projects in seconds and customize only a minimum amount of code.
-* Import and optimize CSV datasets and train the model with them.
-* Visualize the model structure, loss and accuracy functions during training.
-* Export a simple REST API to use your models from a server.
+* scaffold new projects in seconds and customize only a minimum amount of code.
+* import and optimize CSV datasets and train the model with them.
+* visualize the model structure, loss and accuracy functions during training.
+* export a simple REST API to use your models from a server.
 
 **WORK IN PROGRESS, WAIT FOR A STABLE RELEASE**
 
