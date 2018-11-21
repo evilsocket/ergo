@@ -101,6 +101,11 @@ Now it's time to visualize the model structure and how the the `accuracy` and `l
     
     ergo view example
 
+<p align="center">
+  <img alt="ergo view" src="https://raw.githubusercontent.com/evilsocket/ergo/master/docs/view.png"/>
+</p>
+
+
 Once you're done, you can remove the train, test and validation temporary datasets with:
 
     ergo clean example
