@@ -1,6 +1,6 @@
 # Ergo
 
-ergo (from the Latin sentence *"Cogito ergo sum"*) is a tool that makes machine learning and deep learning with [Keras](https://keras.io/) easier. 
+ergo (from the Latin sentence *["Cogito ergo sum"](https://en.wikipedia.org/wiki/Cogito,_ergo_sum)*) is a tool that makes machine learning and deep learning with [Keras](https://keras.io/) easier. 
 
 **It can be used to**: 
 
