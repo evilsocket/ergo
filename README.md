@@ -70,7 +70,7 @@ and `train.py`, to customize the training algorithm:
 
 ```python
 def train_model(model, dataset):
-    log.info("training model is-malware (train on %d samples, validate on %d) ..." % ( \
+    log.info("training model (train on %d samples, validate on %d) ..." % ( \
             len(dataset.Y_train), 
             len(dataset.Y_val) ) )
     
