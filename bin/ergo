@@ -1,0 +1,75 @@
+#!/usr/bin/python3
+
+# https://stackoverflow.com/questions/37558271/python-sklearn-deprecation-warning
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
+
+# https://stackoverflow.com/questions/47068709/your-cpu-supports-instructions-that-this-tensorflow-binary-was-not-compiled-to-u
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+import sys
+import collections
+import logging as log
+
+log.basicConfig(format = '[%(asctime)s] (%(levelname)s) %(message)s', level = log.INFO)
+
+from ergo.action import Action
+
+from ergo.actions.info import action_info
+from ergo.actions.create import action_create
+from ergo.actions.optimize import action_optimize_dataset
+from ergo.actions.train import action_train
+from ergo.actions.clean import action_clean
+from ergo.actions.view import action_view
+from ergo.actions.serve import action_serve
+from ergo.actions.to_fdeep import action_to_fdeep
+
+def get_pad(l):
+    pad = 0
+    for name in l:
+        if len(name) > pad:
+            pad = len(name)
+    return pad
+
+def action_help(argc=0, argv=None):
+    print("usage: ergo <action> [args]")
+
+    global ACTIONS 
+    pad = get_pad(ACTIONS)
+    print("\n  actions:\n")
+    for name in ACTIONS:
+        print( ("\t%" + str(pad) + "s : %s") % ( name, ACTIONS[name].description ) )
+
+    quit()
+
+ACTIONS = collections.OrderedDict([
+    ("help", Action("help", "Print the usage menu.", action_help)),
+    ("info", Action("info", "Print library versions and hardware info.", action_info)),
+    ("optimize-dataset", Action("optimize-dataset", "Perform dataset optimization.", action_optimize_dataset)),
+    ("create", Action("create", "Initialize a new project.", action_create)),
+    ("train", Action("train", "Train a model.", action_train)),
+    ("clean", Action("clean", "Clean a project.", action_clean)),
+    ("view", Action("view", "View a model.", action_view)),
+    ("serve", Action("serve", "Serve a pretrained model via a REST API.", action_serve)),
+    ("to-fdeep", Action("to-fdeep", "Convert a Keras model to fdeep format.", action_to_fdeep))
+])
+
+def main():
+    argc   = len(sys.argv)
+    action = sys.argv[1] if argc >= 2 else None 
+
+    if action is None:
+        action_help()
+
+    elif action not in ACTIONS:
+        log.error("unknown action %s" % action)
+        action_help()
+
+    else:
+        ACTIONS[action].cb(argc - 2, sys.argv[2:])
+
+if __name__ == '__main__':
+    main()
