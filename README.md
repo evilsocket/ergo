@@ -110,14 +110,12 @@ Once you're done, you can remove the train, test and validation temporary datase
 
     ergo clean example
 
-To load the model and start a REST API for evaluation (can be customized with `--host`, `--port` and `--debug` options, default to `http://127.0.0.1:8080/?x=0.345,1.0,0.9,...`): 
+To load the model and start a REST API for evaluation (can be customized with `--host`, `--port` and `--debug` options): 
 
     ergo serve example
 
-Convert the Keras model to [fdeep](https://github.com/Dobiasd/frugally-deep) format:
+You'll be able to access the model for evaluation via `http://127.0.0.1:8080/?x=0.345,1.0,0.9,...`.
 
-    ergo to-fdeep example
-
-Reset the state of a project (**WARNING**: this will remove the datasets, the model files and all training statistics):
+To reset the state of a project (**WARNING**: this will remove the datasets, the model files and all training statistics):
 
     ergo clean example --all
