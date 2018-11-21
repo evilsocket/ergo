@@ -48,11 +48,11 @@ def action_help(argc=0, argv=None):
 ACTIONS = collections.OrderedDict([
     ("help", Action("help", "Print the usage menu.", action_help)),
     ("info", Action("info", "Print library versions and hardware info.", action_info)),
-    ("optimize-dataset", Action("optimize-dataset", "Perform dataset optimization.", action_optimize_dataset)),
-    ("create", Action("create", "Initialize a new project.", action_create)),
-    ("train", Action("train", "Train a model.", action_train)),
-    ("clean", Action("clean", "Clean a project.", action_clean)),
-    ("view", Action("view", "View a model.", action_view)),
+    ("create", Action("create", "Create a new project.", action_create)),
+    ("optimize-dataset", Action("optimize-dataset", "Perform dataset optimization (removes duplicates and keep a given amount from the main dataset).", action_optimize_dataset)),
+    ("train", Action("train", "Train a model (use --dataset /path/file.csv to import a dataset the first time).", action_train)),
+    ("clean", Action("clean", "Clean a project from temporary datasets (use --all to reset a project state).", action_clean)),
+    ("view", Action("view", "View a model structure and accuracy metrics over training.", action_view)),
     ("serve", Action("serve", "Serve a pretrained model via a REST API.", action_serve)),
     ("to-fdeep", Action("to-fdeep", "Convert a Keras model to fdeep format.", action_to_fdeep))
 ])
