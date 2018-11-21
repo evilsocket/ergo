@@ -120,3 +120,8 @@ You'll be able to access the model for evaluation via `http://127.0.0.1:8080/?x=
 To reset the state of a project (**WARNING**: this will remove the datasets, the model files and all training statistics):
 
     ergo clean example --all
+
+#### License
+
+`ergo` was made with ♥  by [Simone Margaritelli](https://www.evilsocket.net/) and it is released under the GPL 3 license.
+
