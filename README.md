@@ -1,6 +1,13 @@
 # Ergo
 
-ergo (from the Latin sentence *"Cogito ergo sum"*) is a tool that makes machine learning and deep learning with [Keras](https://keras.io/) easier. It can be used to scaffold new projects in seconds and customize only the minimum amount of code required for the model creation and training, to import and optimize CSV datasets and train the model with them. It can visualize the model structure, loss and accuracy functions during training and also export a simple REST API to use your models on a server.
+ergo (from the Latin sentence *"Cogito ergo sum"*) is a tool that makes machine learning and deep learning with [Keras](https://keras.io/) easier. 
+
+**It can be used to**: 
+
+* Scaffold new projects in seconds and customize only a minimum amount of code.
+* Import and optimize CSV datasets and train the model with them.
+* Visualize the model structure, loss and accuracy functions during training.
+* Export a simple REST API to use your models from a server.
 
 **WORK IN PROGRESS, WAIT FOR A STABLE RELEASE**
 
