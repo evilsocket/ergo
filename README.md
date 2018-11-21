@@ -19,7 +19,9 @@ Requires `python3` and `pip3`, to install:
     python3 setup.py build
     sudo python3 setup.py install
 
-To enable GPU support, make sure you have [CUDA 9.0 and cuDNN 7.0 installed](https://medium.com/@zhanwenchen/install-cuda-and-cudnn-for-tensorflow-gpu-on-ubuntu-79306e4ac04e) and then:
+##### Enable GPU support
+
+Make sure you have [CUDA 9.0 and cuDNN 7.0 installed](https://medium.com/@zhanwenchen/install-cuda-and-cudnn-for-tensorflow-gpu-on-ubuntu-79306e4ac04e) and then:
 
     sudo pip3 uninstall tensorflow
     sudo pip3 install tensorflow-gpu
