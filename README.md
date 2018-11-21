@@ -1,5 +1,9 @@
 # Ergo
 
+<p align="center">
+  <img alt="ergo view" src="https://raw.githubusercontent.com/evilsocket/ergo/master/docs/banner.jpg"/>
+</p>
+
 ergo (from the Latin sentence *["Cogito ergo sum"](https://en.wikipedia.org/wiki/Cogito,_ergo_sum)*) is a tool that makes machine learning and deep learning with [Keras](https://keras.io/) easier. 
 
 **It can be used to**: 
@@ -104,7 +108,6 @@ Now it's time to visualize the model structure and how the the `accuracy` and `l
 <p align="center">
   <img alt="ergo view" src="https://raw.githubusercontent.com/evilsocket/ergo/master/docs/view.png"/>
 </p>
-
 
 Once you're done, you can remove the train, test and validation temporary datasets with:
 
