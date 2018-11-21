@@ -121,6 +121,16 @@ To reset the state of a project (**WARNING**: this will remove the datasets, the
 
     ergo clean example --all
 
+##### Other commands
+
+Optimize a dataset (get unique rows and reuse 15% of the total samples, customize ratio with the `--reuse-ratio` argument, customize output with `--output`):
+
+    ergo optimize-dataset /some/path/data.csv
+
+Convert the Keras model to [frugally-deep](https://github.com/Dobiasd/frugally-deep) format:
+
+    ergo to-fdeep example
+
 #### License
 
 `ergo` was made with ♥  by [Simone Margaritelli](https://www.evilsocket.net/) and it is released under the GPL 3 license.
