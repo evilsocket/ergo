@@ -30,7 +30,7 @@ def mem_fmt(num, suffix='B'):
     return "%.1f %s%s" % (num, 'Yi', suffix)
 
 def action_info(argc, argv):
-    print("ergo %s" % __version__)
+    print("ergo   %s" % __version__)
     print("keras  %s" % keras.__version__) 
     print("tf     %s" % tf.__version__)
     print("")
