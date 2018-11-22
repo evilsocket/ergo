@@ -1,21 +1,16 @@
 #!/bin/bash
 # nothing to see here, just a utility i use to create new releases ^_^
 
-CURRENT_VERSION=$(cat ergo/version.py | grep = | cut -d"'" -f 2)
-TO_UPDATE=(
-    ergo/version.py
-)
+VERSION_FILE=ergo/version.py
+CURRENT_VERSION=$(cat ${VERSION_FILE} | grep "__version__" | cut -d"'" -f2)
 
 echo -n "Current version is $CURRENT_VERSION, select new version: "
 read NEW_VERSION
 echo "Creating version $NEW_VERSION ...\n"
 
-for file in "${TO_UPDATE[@]}"
-do
-    echo "Patching $file ..."
-    sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g" $file
-    git add $file
-done
+echo "Patching ${VERSION_FILE} ..."
+sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g" "${VERSION_FILE}"
+git add "${VERSION_FILE}"
 
 git commit -m "Releasing v$NEW_VERSION"
 git push
