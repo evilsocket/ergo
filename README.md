@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="ergo view" src="https://raw.githubusercontent.com/evilsocket/ergo/master/docs/banner.jpg"/>
+  <img alt="ergo" src="https://i.imgur.com/EO9PdNp.jpg"/>
 </p>
 
 `ergo` (from the Latin sentence *["Cogito ergo sum"](https://en.wikipedia.org/wiki/Cogito,_ergo_sum)*) is a tool that makes deep learning with [Keras](https://keras.io/) easier. 
