@@ -48,11 +48,10 @@ def action_train(argc, argv):
         quit()
 
     args = parse_args(argv[1:])
-
     if args.dataset is not None:
         # a dataset was specified, split it and generate
         # the subsets
-        prj.dataset.source(args.dataset, args.test, args.validation)
+        prj.prepare(args.dataset, args.test, args.validation)
     elif prj.dataset.exists():
         # no dataset passed, attempt to use the previously
         # generated subsets

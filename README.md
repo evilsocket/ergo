@@ -37,10 +37,36 @@ Once ready, create a new project named `example`:
 
     ergo new example
 
-Inside the newly created `example` folder, there are two files: `model.py`, that you can change to customize the model 
-creation logic:
+Inside the newly created `example` folder, there will be three files: 
+
+1. `prepare.py`, used to preprocess your dataset (if, for instance, you're using pictures instead of a csv file).
+2. `model.py`, that you can change to customize the model.
+3. `train.py`, for the training algorithm.
+
+By default, ergo will simply read the dataset as a CSV file ...
+
+```
+# prepare.py
+
+import pandas as pd
+# this function is called whenever the `ergo train <project> --dataset file.csv`
+# command is executed, the first argument is the dataset and it must return
+# a pandas.DataFrame object.
+def prepare_dataset(filename):
+    # simply read as csv
+    return pd.read_csv(filename, sep = ',', header = None)
+```
+
+... build a very simple neural network with 10 inputs, two hidden layers of 30 neurons each and 2 outputs ...
 
 ```python
+# model.py
+
+import logging as log
+
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Dropout
+
 def build_model(is_train):  
     n_inputs       = 10
     n_hidden       = (30, 30,)
@@ -66,9 +92,13 @@ def build_model(is_train):
     return model
 ```
 
-and `train.py`, to customize the training algorithm:
+... and use a pretty standard training algorithm:
 
 ```python
+import logging as log
+
+from keras.callbacks import EarlyStopping
+
 def train_model(model, dataset):
     log.info("training model (train on %d samples, validate on %d) ..." % ( \
             len(dataset.Y_train), 

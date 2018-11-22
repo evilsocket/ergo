@@ -1,3 +1,15 @@
+prepare = \
+"""
+import pandas as pd
+
+# this function is called whenever the `ergo train <project> --dataset file.csv`
+# command is executed, the first argument is the dataset and it must return
+# a pandas.DataFrame object.
+def prepare_dataset(filename):
+    # simply read as csv
+    return pd.read_csv(filename, sep = ',', header = None)
+"""
+
 model = \
 """
 import logging as log
@@ -5,6 +17,7 @@ import logging as log
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Dropout
 
+# build the model
 def build_model(is_train):  
     n_inputs       = 10
     n_hidden       = (30, 30,)
@@ -36,6 +49,7 @@ import logging as log
 
 from keras.callbacks import EarlyStopping
 
+# define training strategy
 def train_model(model, dataset):
     log.info("training model (train on %d samples, validate on %d) ..." % ( \\
             len(dataset.Y_train), 
@@ -57,6 +71,7 @@ def train_model(model, dataset):
 """
 
 Templates = { 
-    'model.py': model,
-    'train.py': train
+    'prepare.py' : prepare,
+    'model.py'   : model,
+    'train.py'   : train
 }

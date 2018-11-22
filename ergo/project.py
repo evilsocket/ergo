@@ -2,7 +2,6 @@ import os
 import shutil
 import json
 import logging as log
-from importlib.machinery import SourceFileLoader
 
 import numpy as np
 from sklearn.metrics import classification_report, confusion_matrix
@@ -11,6 +10,7 @@ from keras.models import model_from_yaml, load_model
 from keras.utils.vis_utils import plot_model
 from keras.utils.training_utils import multi_gpu_model
 
+from ergo.logic import Logic
 from ergo.dataset import Dataset
 from ergo.templates import Templates
 
@@ -21,7 +21,7 @@ class Project(object):
         for filename, data in Templates.items():
             log.info( "creating %s", filename)
             with open( os.path.join(path, filename), 'wt' ) as fp:
-                fp.write(data)
+                fp.write(data.strip())
 
     @staticmethod
     def clean(path, full):
@@ -41,17 +41,19 @@ class Project(object):
                         os.remove(fname)
 
     def __init__(self, path):
-        self.path           = os.path.abspath(path)
-        self.builder_path   = os.path.join(self.path, 'model.py')
+        # base info
+        self.path  = os.path.abspath(path)
+        self.logic = Logic(self.path)
+        # model related data
+        self.model          = None
         self.model_path     = os.path.join(self.path, 'model.yml')
         self.model_img_path = os.path.join(self.path, 'model.png')
         self.weights_path   = os.path.join(self.path, 'model.h5')
         self.fdeep_path     = os.path.join(self.path, 'model.fdeep')
+        # training related data
+        self.dataset        = Dataset(self.path)
         self.stats_path     = os.path.join(self.path, 'model.stats')
         self.history_path   = os.path.join(self.path, 'history.json')
-        self.trainer_path   = os.path.join(self.path, 'train.py')
-        self.dataset        = Dataset(self.path)
-        self.model          = None
         self.history        = None
     
     def exists(self):
@@ -60,24 +62,13 @@ class Project(object):
     def is_trained(self):
         return os.path.exists(self.weights_path)
 
-    def _load_file(self, name, symbol):
-        log.debug("loading symbol %s from %s ..." % (symbol, name))
-        doer = SourceFileLoader("",name).load_module()
-        if symbol not in doer.__dict__:
-            return None, "%s does not define a %s function" % (name, symbol)
-        return doer.__dict__[symbol], None
-
     def load(self):
         log.info("loading project %s ..." % self.path)
 
         if not self.exists():
             return "%s does not exist" % self.path
 
-        self.builder, err = self._load_file(self.builder_path, 'build_model')
-        if err is not None:
-            return err
-
-        self.trainer, err = self._load_file(self.trainer_path, 'train_model')
+        err = self.logic.load()
         if err is not None:
             return err
 
@@ -93,7 +84,7 @@ class Project(object):
                 self.model = model_from_yaml(fp.read())
 
         else:
-            self.model = self.builder(True)
+            self.model = self.logic.builder(True)
                 
         if os.path.exists(self.history_path):
             log.debug("loading history from %s ...", self.history_path)
@@ -143,17 +134,22 @@ class Project(object):
             out.write(acc['test'][0]+"\n")
             out.write("%s\n" % acc['test'][1])
 
+    def prepare(self, filename, p_test, p_val):
+        log.info("preparing data from %s ...", filename)
+        data = self.logic.preparer(filename)
+        return self.dataset.source(data, p_test, p_val)
+
     def train(self, gpus):
         # train
         if self.model is None:
-            self.model = self.builder(True)
+            self.model = self.logic.builder(True)
 
         to_train = self.model
         if gpus > 1:
             log.info("training with %d GPUs", gpus)
             to_train = multi_gpu_model(self.model, gpus=gpus)
 
-        self.history = self.trainer(to_train, self.dataset).history
+        self.history = self.logic.trainer(to_train, self.dataset).history
         # save model structure and weights
         self._save_model()
         # save training history

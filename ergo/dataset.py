@@ -113,14 +113,12 @@ class Dataset(object):
         self.n_labels  = len(np.unique(u))
         self._set_xys()
     
-    def source(self, filename, p_test, p_val):
-        log.info("generating train, test and validation datasets from %s (test=%f validation=%f) ...", 
-                filename, 
+    def source(self, data, p_test, p_val):
+        log.info("generating train, test and validation datasets (test=%f validation=%f) ...", 
                 p_test, 
                 p_val)
 
-        dataset = pd.read_csv(filename, sep = ',', header = None)
-        dataset = dataset.sample(frac = 1).reset_index(drop = True)
+        dataset = data.sample(frac = 1).reset_index(drop = True)
         n_tot   = len(dataset)
         n_train = int(n_tot * ( 1 - p_test - p_val))
         n_test  = int(n_tot * p_test)
