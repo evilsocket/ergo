@@ -166,6 +166,7 @@ class Project(object):
         import matplotlib.image as mpimg
 
         if self.model is not None:
+            self.model.summary()
             log.info("saving model to %s ...", self.model_img_path)
             plot_model(self.model, to_file=self.model_img_path)
             img = mpimg.imread(self.model_img_path)
