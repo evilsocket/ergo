@@ -11,12 +11,11 @@
 * visualize the model structure, loss and accuracy functions during training.
 * export a simple REST API to use your models from a server.
 
-**WORK IN PROGRESS, WAIT FOR A STABLE RELEASE**
-
 #### Installation
 
-Requires `python3` and `pip3`, to install:
+Download the [latest stable release](https://github.com/evilsocket/ergo/releases), extract and:
 
+    cd /path/to/ergo
     sudo pip3 install -r requirements.txt
     python3 setup.py build
     sudo python3 setup.py install
