@@ -164,7 +164,10 @@ class Project(object):
         if self.model is not None:
             self.model.summary()
             log.info("saving model to %s ...", self.model_img_path)
-            plot_model(self.model, to_file=self.model_img_path)
+            plot_model( self.model, 
+                    to_file = self.model_img_path,
+                    show_shapes = True, 
+                    show_layer_names = True)
             img = mpimg.imread(self.model_img_path)
             plt.figure()
             plt.imshow(img)
@@ -172,20 +175,24 @@ class Project(object):
         if self.history is not None:
             plt.figure()
             # Plot training & validation accuracy values
+            plt.subplot(2,1,1)
             plt.plot(self.history['acc'])
             plt.plot(self.history['val_acc'])
             plt.title('Model accuracy')
             plt.ylabel('Accuracy')
             plt.xlabel('Epoch')
-            plt.legend(['Train', 'Test'], loc='upper left')
-            plt.figure()
+            plt.legend(['Train', 'Test'], loc='lower right')
+            
             # Plot training & validation loss values
+            plt.subplot(2,1,2)
             plt.plot(self.history['loss'])
             plt.plot(self.history['val_loss'])
             plt.title('Model loss')
             plt.ylabel('Loss')
             plt.xlabel('Epoch')
-            plt.legend(['Train', 'Test'], loc='upper left')
+            plt.legend(['Train', 'Test'], loc='upper right')
+
+            plt.tight_layout()
         
         plt.show()
 
