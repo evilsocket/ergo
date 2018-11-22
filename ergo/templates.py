@@ -18,9 +18,9 @@ def build_model(is_train):
     for i, n_neurons in enumerate(n_hidden):
         # setup the input layer
         if i == 0:
-            model.add(Dense(600, input_shape = (n_inputs,), activation = activation))
+            model.add(Dense(n_neurons, input_shape = (n_inputs,), activation = activation))
         else:
-            model.add(Dense(600, activation = activation))
+            model.add(Dense(n_neurons, activation = activation))
         # add dropout
         if is_train:
             model.add(Dropout(dropout))
