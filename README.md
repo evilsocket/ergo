@@ -2,7 +2,7 @@
   <img alt="ergo view" src="https://raw.githubusercontent.com/evilsocket/ergo/master/docs/banner.jpg"/>
 </p>
 
-`ergo` (from the Latin sentence *["Cogito ergo sum"](https://en.wikipedia.org/wiki/Cogito,_ergo_sum)*) is a tool that makes machine learning and deep learning with [Keras](https://keras.io/) easier. 
+`ergo` (from the Latin sentence *["Cogito ergo sum"](https://en.wikipedia.org/wiki/Cogito,_ergo_sum)*) is a tool that makes deep learning with [Keras](https://keras.io/) easier. 
 
 **It can be used to**: 
 

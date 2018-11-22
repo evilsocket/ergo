@@ -6,7 +6,7 @@ import os
 try:
     long_description = open( 'README.md', 'rt' ).read()
 except:
-    long_description = 'Ergo utilities and training framework.'
+    long_description = 'ergo is a tool that makes deep learning with Keras easier.'
 
 setup( name                 = 'ergo',
        version              = __version__,
