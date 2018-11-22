@@ -45,7 +45,7 @@ Inside the newly created `example` folder, there will be three files:
 
 By default, ergo will simply read the dataset as a CSV file ...
 
-```
+```python
 # prepare.py
 
 import pandas as pd
