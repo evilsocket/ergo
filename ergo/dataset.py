@@ -6,19 +6,12 @@ import numpy as np
 import pandas as pd
 
 from keras.utils import to_categorical
+from ergo.utils import clean_if_exist
 
 class Dataset(object):
     @staticmethod 
     def clean(path):
-        path  = os.path.abspath(path)
-        paths = ( \
-            os.path.join(path, 'data-train.csv'),
-            os.path.join(path, 'data-test.csv'),
-            os.path.join(path, 'data-validation.csv'))
-        for p in paths:
-            if os.path.exists(p):
-                log.info("removing %s", p)
-                os.remove(p)
+        clean_if_exist(path, ('data-train.csv', 'data-test.csv', 'data-validation.csv'))
 
     @staticmethod
     def optimize(path, reuse = 0.15, output = None):

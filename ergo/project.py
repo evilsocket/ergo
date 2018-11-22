@@ -1,5 +1,4 @@
 import os
-import shutil
 import json
 import logging as log
 
@@ -13,6 +12,7 @@ from keras.utils.training_utils import multi_gpu_model
 from ergo.logic import Logic
 from ergo.dataset import Dataset
 from ergo.templates import Templates
+from ergo.utils import clean_if_exist
 
 class Project(object):
     @staticmethod
@@ -25,20 +25,18 @@ class Project(object):
 
     @staticmethod
     def clean(path, full):
-        if not full:
-            # clean dataset files only
-            Dataset.clean(path)
-        else:
+        Dataset.clean(path)
+        if full:
             # clean everything
-            keep = Templates.keys()
-            for fname in os.listdir(path):
-                if fname not in keep:
-                    fname = os.path.join(path, fname)
-                    log.info("removing %s", fname)
-                    if os.path.isdir(fname):
-                        shutil.rmtree(fname)
-                    else:
-                        os.remove(fname)
+            clean_if_exist(path, ( \
+                '__pycache__',
+                'logs',
+                'model.yml',
+                'model.png',
+                'model.h5',
+                'model.fdeep',
+                'model.stats',
+                'history.json'))
 
     def __init__(self, path):
         # base info
