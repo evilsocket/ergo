@@ -35,7 +35,7 @@ and tensorflow versions) and some hardware info with `ergo info` to verify your 
 
 Once ready, create a new project named `example`:
 
-    ergo new example
+    ergo create example
 
 Inside the newly created `example` folder, there will be three files: 
 
@@ -43,83 +43,9 @@ Inside the newly created `example` folder, there will be three files:
 2. `model.py`, that you can change to customize the model.
 3. `train.py`, for the training algorithm.
 
-By default, ergo will simply read the dataset as a CSV file ...
-
-```python
-# prepare.py
-
-import pandas as pd
-# this function is called whenever the `ergo train <project> --dataset file.csv`
-# command is executed, the first argument is the dataset and it must return
-# a pandas.DataFrame object.
-def prepare_dataset(filename):
-    # simply read as csv
-    return pd.read_csv(filename, sep = ',', header = None)
-```
-
-... build a very simple neural network with 10 inputs, two hidden layers of 30 neurons each and 2 outputs ...
-
-```python
-# model.py
-
-import logging as log
-
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout
-
-def build_model(is_train):  
-    n_inputs       = 10
-    n_hidden       = (30, 30,)
-    dropout        = 0.4
-    activation     = 'relu'
-    out_activation = 'softmax'
-  
-    log.info("building model for %s ..." % 'training' if is_train else 'evaluation')
-
-    model = Sequential()
-    for i, n_neurons in enumerate(n_hidden):
-        # setup the input layer
-        if i == 0:
-            model.add(Dense(n_neurons, input_shape = (n_inputs,), activation = activation))
-        else:
-            model.add(Dense(n_neurons, activation = activation))
-        # add dropout
-        if is_train:
-            model.add(Dropout(dropout))
-    # setup output layer
-    model.add(Dense(2, activation = out_activation))
-    
-    return model
-```
-
-... and use a pretty standard training algorithm:
-
-```python
-# train.py
-
-import logging as log
-
-from keras.callbacks import EarlyStopping
-
-def train_model(model, dataset):
-    log.info("training model (train on %d samples, validate on %d) ..." % ( \
-            len(dataset.Y_train), 
-            len(dataset.Y_val) ) )
-    
-    loss      = 'binary_crossentropy'
-    optimizer = 'adam'
-    metrics   = ['accuracy']
-    
-    model.compile(loss = loss, optimizer = optimizer, metrics = metrics)
-
-    earlyStop = EarlyStopping(monitor = 'val_acc', min_delta=0.0001, patience = 5, mode = 'auto')
-    return model.fit( dataset.X_train, dataset.Y_train,
-            batch_size = 64,
-            epochs = 50,
-            verbose = 2,
-            validation_data = (dataset.X_val, dataset.Y_val),
-            callbacks = [earlyStop])
-```
+By default, ergo will simply read the dataset as a CSV file, build a small neural network with 10 inputs, two hidden layers of 30 neurons 
+each and 2 outputs and use a pretty standard training algorithm. You can see a complete (and more complex) example on the [planes-detector](https://github.com/evilsocket/ergo-planes-detector) 
+project repository.
 
 After defining the model structure and the training process, you can import a CSV dataset (first column must be the label) and start training using 2 GPUs:
 
@@ -134,10 +60,6 @@ If you want to update a model and/or train it on already imported data, you can 
 Now it's time to visualize the model structure and how the the `accuracy` and `loss` metrics changed during training (requires `sudo apt-get install graphviz python3-tk`):
     
     ergo view example
-
-<p align="center">
-  <img alt="ergo view" src="https://raw.githubusercontent.com/evilsocket/ergo/master/docs/view.png"/>
-</p>
 
 Once you're done, you can remove the train, test and validation temporary datasets with:
 
