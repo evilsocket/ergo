@@ -95,6 +95,8 @@ def build_model(is_train):
 ... and use a pretty standard training algorithm:
 
 ```python
+# train.py
+
 import logging as log
 
 from keras.callbacks import EarlyStopping
