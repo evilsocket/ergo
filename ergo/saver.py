@@ -6,7 +6,7 @@ class Saver(object):
         self.dataset = dataset
 
     @staticmethod
-    def _worker(self, v, filename):
+    def _worker(v, filename):
         log.info("saving %s ..." % filename)
         v.to_csv(filename, sep = ',', header = None, index = None)
 
