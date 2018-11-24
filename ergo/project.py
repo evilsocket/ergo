@@ -120,17 +120,22 @@ class Project(object):
 
     def _save_stats(self):
         log.info("updating %s ...", self.stats_path)
-        acc = self.accuracy()
-        with open(self.stats_path, 'w') as out:
-            out.write("[*] Training stats:\n")
-            out.write(acc['train'][0]+"\n")
-            out.write("%s\n" % acc['train'][1])
-            out.write("\n\n[*] Validation stats:\n")
-            out.write(acc['val'][0]+"\n")
-            out.write("%s\n" % acc['val'][1])
-            out.write("\n\n[*] Test stats:\n")
-            out.write(acc['test'][0]+"\n")
-            out.write("%s\n" % acc['test'][1])
+        acc  = self.accuracy()
+        what = { \
+            'train' : "Training --------------------------------------------\n",
+            'val'   : "Validation ------------------------------------------\n",
+            'test'  : "Test ------------------------------------------------\n"
+        }
+        with open(self.stats_path, 'w') as fp:
+            for who, header in what.items():
+                vals = acc[who]
+                fp.write( header )
+                fp.write( vals[0] )
+                fp.write("\n\n")
+                fp.write("confusion matrix:")
+                fp.write("\n\n")
+                fp.write("%s\n" % vals[1])
+                fp.write("\n")
 
     def prepare(self, filename, p_test, p_val):
         log.info("preparing data from %s ...", filename)
