@@ -1,12 +1,14 @@
 import os
-import threading
 import logging as log
 
 import numpy as np
 import pandas as pd
 
 from keras.utils import to_categorical
+
 from ergo.utils import clean_if_exist
+from ergo.saver import Saver
+from ergo.loader import Loader
 
 class Dataset(object):
     @staticmethod 
@@ -45,6 +47,8 @@ class Dataset(object):
         self.train_path = os.path.join(self.path, 'data-train.csv')
         self.test_path  = os.path.join(self.path, 'data-test.csv')
         self.valid_path = os.path.join(self.path, 'data-validation.csv')
+        self.saver      = Saver(self)
+        self.loader     = Loader(self)
         self.n_labels   = 0
         self.train      = None
         self.test       = None
@@ -69,41 +73,8 @@ class Dataset(object):
         self.X_val   = self.validation.values[:,1:]
         self.Y_val   = to_categorical(self.validation.values[:,0], self.n_labels)
 
-    def _save_thread(self, v, filename):
-        log.info("saving %s ..." % filename)
-        v.to_csv(filename, sep = ',', header = None, index = None)
-
-    def _save(self):
-        threads = ( \
-          threading.Thread(target=self._save_thread, args=( self.train, self.train_path, )),
-          threading.Thread(target=self._save_thread, args=( self.test, self.test_path, )),
-          threading.Thread(target=self._save_thread, args=( self.validation, self.valid_path, )) 
-        )
-
-        for t in threads:
-            t.start()
-
-        for t in threads:
-            t.join()
-
-        self._set_xys()
-
     def load(self):
-        log.info("loading %s ..." % self.train_path)
-        self.train = pd.read_csv(self.train_path, sep = ',', header = None)
-
-        log.info("loading %s ..." % self.test_path)
-        self.test = pd.read_csv(self.test_path, sep = ',', header = None)
-
-        log.info("loading %s ..." % self.valid_path)
-        self.validation = pd.read_csv(self.valid_path, sep = ',', header = None)
-
-        u = np.concatenate( \
-                (self.validation.iloc[:,0].unique(), 
-                self.test.iloc[:,0].unique(),
-                self.train.iloc[:,0].unique()) )
-
-        self.n_labels  = len(np.unique(u))
+        self.loader.load()
         self._set_xys()
     
     def source(self, data, p_test, p_val):
@@ -122,4 +93,5 @@ class Dataset(object):
         self.test       = dataset.head(n_train + n_test).tail(n_test)
         self.validation = dataset.tail(n_val)
 
-        self._save()
+        self.saver.save()
+        self._set_xys()
