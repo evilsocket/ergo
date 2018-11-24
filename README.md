@@ -1,6 +1,11 @@
 <p align="center">
   <img alt="ergo" src="https://i.imgur.com/EO9PdNp.jpg"/>
+  <p align="center">
+    <a href="https://github.com/evilsocket/ergo/releases/latest"><img alt="Release" src="https://img.shields.io/github/release/evilsocket/ergo.svg?style=flat-square"></a>
+    <a href="https://github.com/evilsocket/ergo/blob/master/LICENSE.md"><img alt="Software License" src="https://img.shields.io/badge/license-GPL3-brightgreen.svg?style=flat-square"></a>
+  </p>
 </p>
+
 
 `ergo` (from the Latin sentence *["Cogito ergo sum"](https://en.wikipedia.org/wiki/Cogito,_ergo_sum)*) is a tool that makes deep learning with [Keras](https://keras.io/) easier. 
 
