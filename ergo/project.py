@@ -9,10 +9,11 @@ from keras.models import model_from_yaml, load_model
 from keras.utils.vis_utils import plot_model
 from keras.utils.training_utils import multi_gpu_model
 
-from ergo.logic import Logic
+from ergo.core.logic import Logic
+from ergo.core.utils import clean_if_exist
+
 from ergo.dataset import Dataset
 from ergo.templates import Templates
-from ergo.utils import clean_if_exist
 
 class Project(object):
     @staticmethod
@@ -91,16 +92,16 @@ class Project(object):
         
         return None
     
-    def _accuracy_for(self, X, Y):
+    def accuracy_for(self, X, Y, repo_as_dict = False):
         Y_tpred = np.argmax(self.model.predict(X), axis = 1)
-        repo    = classification_report(np.argmax(Y, axis = 1), Y_tpred)
+        repo    = classification_report(np.argmax(Y, axis = 1), Y_tpred, output_dict = repo_as_dict)
         cm      = confusion_matrix(np.argmax(Y, axis = 1), Y_tpred)
         return repo, cm
 
     def accuracy(self):
-        train, tr_cm = self._accuracy_for(self.dataset.X_train, self.dataset.Y_train)
-        test,  ts_cm = self._accuracy_for(self.dataset.X_test, self.dataset.Y_test)
-        val,  val_cm = self._accuracy_for(self.dataset.X_val, self.dataset.Y_val)
+        train, tr_cm = self.accuracy_for(self.dataset.X_train, self.dataset.Y_train)
+        test,  ts_cm = self.accuracy_for(self.dataset.X_test, self.dataset.Y_test)
+        val,  val_cm = self.accuracy_for(self.dataset.X_val, self.dataset.Y_val)
         return {'train': (train, tr_cm), 
                 'test': (test, ts_cm), 
                 'val': (val, val_cm)}

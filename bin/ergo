@@ -24,6 +24,7 @@ from ergo.actions.optimize import action_optimize_dataset
 from ergo.actions.train import action_train
 from ergo.actions.clean import action_clean
 from ergo.actions.view import action_view
+from ergo.actions.compare import action_compare
 from ergo.actions.serve import action_serve
 from ergo.actions.to_fdeep import action_to_fdeep
 
@@ -53,6 +54,7 @@ ACTIONS = collections.OrderedDict([
     ("train", Action("train", "Train a model (use --dataset /path/file.csv to import a dataset the first time).", action_train)),
     ("clean", Action("clean", "Clean a project from temporary datasets (use --all to reset a project state).", action_clean)),
     ("view", Action("view", "View a model structure and accuracy metrics over training.", action_view)),
+    ("cmp", Action("cmp", "Evaluate performances of two models against a given dataset.", action_compare)),
     ("serve", Action("serve", "Serve a pretrained model via a REST API.", action_serve)),
     ("to-fdeep", Action("to-fdeep", "Convert a Keras model to fdeep format.", action_to_fdeep))
 ])
@@ -69,7 +71,11 @@ def main():
         action_help()
 
     else:
-        ACTIONS[action].cb(argc - 2, sys.argv[2:])
+        try:
+            ACTIONS[action].cb(argc - 2, sys.argv[2:])
+        except Exception as e:
+            log.critical("%s", e)
+            # log.exception("\n\n")
 
 if __name__ == '__main__':
     main()
