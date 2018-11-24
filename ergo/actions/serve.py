@@ -19,10 +19,12 @@ def route():
         return "Missing 'x' parameter.", 400
 
     try:
-        x = pd.read_csv(pd.compat.StringIO(x), sep = ',', header = None)
+        x = prj.logic.prepare_input(x)
         y = prj.model.predict(x)
         return jsonify(y.tolist())
     except Exception as e:
+        #log.exception("error while predicting on %s", x)
+        log.error("%s", e)
         return str(e), 400
 
 def parse_args(argv):

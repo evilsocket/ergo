@@ -134,7 +134,7 @@ class Project(object):
 
     def prepare(self, filename, p_test, p_val):
         log.info("preparing data from %s ...", filename)
-        data = self.logic.preparer(filename)
+        data = self.logic.prepare_dataset(filename)
         return self.dataset.source(data, p_test, p_val)
 
     def train(self, gpus):

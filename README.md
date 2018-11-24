@@ -38,7 +38,7 @@ Once ready, create a new project named `example`:
 
 Inside the newly created `example` folder, there will be three files: 
 
-1. `prepare.py`, used to preprocess your dataset (if, for instance, you're using pictures instead of a csv file).
+1. `prepare.py`, used to preprocess your dataset and inputs (if, for instance, you're using pictures instead of a csv file).
 2. `model.py`, that you can change to customize the model.
 3. `train.py`, for the training algorithm.
 
