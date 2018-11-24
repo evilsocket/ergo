@@ -16,7 +16,7 @@ import logging as log
 
 log.basicConfig(format = '[%(asctime)s] (%(levelname)s) %(message)s', level = log.INFO)
 
-from ergo.action import Action
+from ergo.core.action import Action
 
 from ergo.actions.info import action_info
 from ergo.actions.create import action_create
