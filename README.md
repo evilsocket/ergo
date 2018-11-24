@@ -43,8 +43,8 @@ Inside the newly created `example` folder, there will be three files:
 3. `train.py`, for the training algorithm.
 
 By default, ergo will simply read the dataset as a CSV file, build a small neural network with 10 inputs, two hidden layers of 30 neurons 
-each and 2 outputs and use a pretty standard training algorithm. You can see a complete (and more complex) example on the [planes-detector](https://github.com/evilsocket/ergo-planes-detector) 
-project repository.
+each and 2 outputs and use a pretty standard training algorithm. **You can see a complete (and more complex) example on the [planes-detector](https://github.com/evilsocket/ergo-planes-detector) 
+project repository**.
 
 After defining the model structure and the training process, you can import a CSV dataset (first column must be the label) and start training using 2 GPUs:
 
