@@ -1,9 +1,13 @@
+import sys
+stderr = sys.stderr
+sys.stderr = open('/dev/null', 'w')
 import keras
+sys.stderr = stderr 
 
 import tensorflow as tf
 from tensorflow.python.client import device_lib
 
-from ergo.version import __version__
+from ergo.version import banner, __version__
 
 def get_pads(devs):
     namepad = 0
@@ -30,10 +34,9 @@ def mem_fmt(num, suffix='B'):
     return "%.1f %s%s" % (num, 'Yi', suffix)
 
 def action_info(argc, argv):
-    print("ergo   %s" % __version__)
-    print("keras  %s" % keras.__version__) 
-    print("tf     %s" % tf.__version__)
+    print(banner.strip("\n") % (__version__, keras.__version__, tf.__version__))
     print("")
+    print("Hardware:\n")
 
     devs = device_lib.list_local_devices()
     npad, tpad  = get_pads(devs)
