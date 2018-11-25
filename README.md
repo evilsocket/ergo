@@ -81,9 +81,9 @@ To reset the state of a project (**WARNING**: this will remove the datasets, the
 
 ##### Other commands
 
-Evaluate and compare the performances of two trained models on a given dataset:
+Evaluate and compare the performances of two trained models on a given dataset and (optionally) output the differences to a json file:
 
-    ergo cmp example_a example_b --dataset /path/to/data.csv
+    ergo cmp example_a example_b --dataset /path/to/data.csv --to-json diffs.json
 
 Optimize a dataset (get unique rows and reuse 15% of the total samples, customize ratio with the `--reuse-ratio` argument, customize output with `--output`):
 
