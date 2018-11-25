@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import logging as log
 
@@ -45,6 +46,7 @@ class Project(object):
         self.logic = Logic(self.path)
         # model related data
         self.model          = None
+        self.accu           = None
         self.model_path     = os.path.join(self.path, 'model.yml')
         self.model_img_path = os.path.join(self.path, 'model.png')
         self.weights_path   = os.path.join(self.path, 'model.h5')
@@ -54,7 +56,12 @@ class Project(object):
         self.stats_path     = os.path.join(self.path, 'model.stats')
         self.history_path   = os.path.join(self.path, 'history.json')
         self.history        = None
-    
+        self.what           = {
+            'train' : "Training --------------------------------------------\n",
+            'val'   : "Validation ------------------------------------------\n",
+            'test'  : "Test ------------------------------------------------\n"
+        }
+
     def exists(self):
         return os.path.exists(self.path)
 
@@ -119,24 +126,21 @@ class Project(object):
         with open(self.history_path, 'w') as fp:
             json.dump(self.history, fp) 
 
+    def _out_stats(self, where):
+        for who, header in self.what.items():
+            vals = self.accu[who]
+            where.write( header )
+            where.write( vals[0] )
+            where.write("\n\n")
+            where.write("confusion matrix:")
+            where.write("\n\n")
+            where.write("%s\n" % vals[1])
+            where.write("\n")
+
     def _save_stats(self):
         log.info("updating %s ...", self.stats_path)
-        acc  = self.accuracy()
-        what = { \
-            'train' : "Training --------------------------------------------\n",
-            'val'   : "Validation ------------------------------------------\n",
-            'test'  : "Test ------------------------------------------------\n"
-        }
         with open(self.stats_path, 'w') as fp:
-            for who, header in what.items():
-                vals = acc[who]
-                fp.write( header )
-                fp.write( vals[0] )
-                fp.write("\n\n")
-                fp.write("confusion matrix:")
-                fp.write("\n\n")
-                fp.write("%s\n" % vals[1])
-                fp.write("\n")
+            self._out_stats(fp)
 
     def prepare(self, filename, p_test, p_val):
         log.info("preparing data from %s ...", filename)
@@ -153,7 +157,12 @@ class Project(object):
             log.info("training with %d GPUs", gpus)
             to_train = multi_gpu_model(self.model, gpus=gpus)
 
-        self.history = self.logic.trainer(to_train, self.dataset).history
+        self.history  = self.logic.trainer(to_train, self.dataset).history
+        self.accu     = self.accuracy() 
+
+        print("")
+        self._out_stats(sys.stdout)
+
         # save model structure and weights
         self._save_model()
         # save training history
