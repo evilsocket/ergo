@@ -21,7 +21,6 @@ class Saver(object):
             t.start()
     
     def wait(self):
-        if True in [t.isAlive() for t in self.threads]:
-            log.info("waiting for datasets saving to complete ...")
-            for t in self.threads:
-                t.join()
+        log.info("waiting for datasets saving to complete ...")
+        for t in self.threads:
+            t.join()
