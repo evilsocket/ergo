@@ -157,6 +157,9 @@ class Project(object):
             log.info("training with %d GPUs", gpus)
             to_train = multi_gpu_model(self.model, gpus=gpus)
 
+        # async datasets saver might be running, wait before exiting
+        self.dataset.saver.wait()
+
         self.history  = self.logic.trainer(to_train, self.dataset).history
         self.accu     = self.accuracy() 
 

@@ -61,5 +61,3 @@ def action_train(argc, argv):
         quit()
 
     prj.train(args.gpus)
-    # async datasets saver might be running, wait before exiting
-    prj.dataset.saver.wait()
