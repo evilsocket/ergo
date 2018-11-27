@@ -4,7 +4,7 @@ import logging as log
 class Saver(object):
     def __init__(self, dataset):
         self.dataset = dataset
-        self.threads = []
+        self.threads = None
 
     @staticmethod
     def _worker(v, filename):
@@ -21,6 +21,7 @@ class Saver(object):
             t.start()
     
     def wait(self):
-        log.info("waiting for datasets saving to complete ...")
-        for t in self.threads:
-            t.join()
+        if self.threads is not None:
+            log.info("waiting for datasets saving to complete ...")
+            for t in self.threads:
+                t.join()
