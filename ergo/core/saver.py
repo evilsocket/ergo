@@ -9,7 +9,7 @@ class Saver(object):
     @staticmethod
     def _worker(v, filename):
         log.info("saving %s ..." % filename)
-        v.to_csv(filename, sep = ',', header = None, index = None)
+        v.to_csv(filename, sep = ',', header = None, index = None, chunksize=512)
 
     def save(self):
         self.threads = [ \
