@@ -33,6 +33,7 @@ def parse_args(argv):
     parser.add_argument("-g", "--gpus", dest = "gpus", action = "store", type = int, default = 0)
     parser.add_argument("-t", "--test", dest = "test", action = "store", type = probability, default = 0.15, required = False)
     parser.add_argument("-v", "--validation", dest = "validation", action = "store", type = probability, default = 0.15, required = False)
+    parser.add_argument("--no-save", dest="no_save", action="store_true", default = False, help = "Do not save temporary datasets on disk.")
     args = parser.parse_args(argv)
     validate_args(args)
     return args
@@ -51,6 +52,7 @@ def action_train(argc, argv):
     if args.dataset is not None:
         # a dataset was specified, split it and generate
         # the subsets
+        prj.dataset.do_save = not args.no_save
         prj.prepare(args.dataset, args.test, args.validation)
     elif prj.dataset.exists():
         # no dataset passed, attempt to use the previously

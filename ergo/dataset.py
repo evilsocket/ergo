@@ -33,6 +33,7 @@ class Dataset(object):
         self.valid_path = os.path.join(self.path, 'data-validation.csv')
         self.saver      = Saver(self)
         self.loader     = Loader(self)
+        self.do_save    = True
         self.n_labels   = 0
         self.train      = None
         self.test       = None
@@ -85,7 +86,8 @@ class Dataset(object):
             self.test       = dataset.head(n_train + n_test).tail(n_test)
             self.validation = dataset.tail(n_val)
 
-            self.saver.save()
+            if self.do_save:
+                self.saver.save()
         else:
             self.train = dataset
 
