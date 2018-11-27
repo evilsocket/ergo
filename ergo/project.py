@@ -148,6 +148,9 @@ class Project(object):
         return self.dataset.source(data, p_test, p_val)
 
     def train(self, gpus):
+        # async datasets saver might be running, wait before training
+        self.dataset.saver.wait()
+        
         # train
         if self.model is None:
             self.model = self.logic.builder(True)
@@ -156,9 +159,6 @@ class Project(object):
         if gpus > 1:
             log.info("training with %d GPUs", gpus)
             to_train = multi_gpu_model(self.model, gpus=gpus)
-
-        # async datasets saver might be running, wait before exiting
-        self.dataset.saver.wait()
 
         self.history  = self.logic.trainer(to_train, self.dataset).history
         self.accu     = self.accuracy() 
