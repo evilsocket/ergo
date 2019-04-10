@@ -25,6 +25,7 @@ from ergo.actions.train import action_train
 from ergo.actions.clean import action_clean
 from ergo.actions.view import action_view
 from ergo.actions.compare import action_compare
+from ergo.actions.relevance import action_relevance
 from ergo.actions.serve import action_serve
 from ergo.actions.to_fdeep import action_to_fdeep
 
@@ -55,6 +56,7 @@ ACTIONS = collections.OrderedDict([
     ("clean", Action("clean", "Clean a project from temporary datasets (use --all to reset a project state).", action_clean)),
     ("view", Action("view", "View a model structure and accuracy metrics over training.", action_view)),
     ("cmp", Action("cmp", "Evaluate performances of two models against a given dataset.", action_compare)),
+    ("relevance", Action("relevance", "Run evaluation several times by nulling feature by feature and returning the relevance of each one.", action_relevance)),
     ("serve", Action("serve", "Serve a pretrained model via a REST API.", action_serve)),
     ("to-fdeep", Action("to-fdeep", "Convert a Keras model to fdeep format.", action_to_fdeep))
 ])
