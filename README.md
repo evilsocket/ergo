@@ -65,6 +65,10 @@ Now it's time to visualize the model structure and how the the `accuracy` and `l
     
     ergo view example
 
+You can use the `relevance` command to evaluate the model on a given set by nulling one attribute at a time and measuring how that influenced the accuracy (`feature.names` is an optional file with the names of the attributes, one per line):
+
+    ergo relevance example --dataset /some/path/data.csv --attributes /some/path/feature.names
+
 Once you're done, you can remove the train, test and validation temporary datasets with:
 
     ergo clean example

@@ -15,7 +15,7 @@ def usage():
 def parse_args(argv):
     parser = argparse.ArgumentParser(description="relevance")
     parser.add_argument("-d", "--dataset", dest = "dataset", action = "store", type = str, required = True)
-    parser.add_argument("-a", "--attributes", dest = "attributes", action = "store", type = str, required = True)
+    parser.add_argument("-a", "--attributes", dest = "attributes", action = "store", type = str, required = False)
     args = parser.parse_args(argv)
     return args
 
@@ -33,14 +33,18 @@ def action_relevance(argc, argv):
         log.error("no trained Keras model found for this project")
         quit()
 
-    attributes = []
-    with open(args.attributes) as f:
-        attributes = f.readlines()
-    attributes = [x.strip() for x in attributes] 
-
     prj.prepare(args.dataset, 0.0, 0.0)
 
     nrows, ncols = prj.dataset.X.shape
+
+    attributes = []
+
+    if args.attributes is not None:
+        with open(args.attributes) as f:
+            attributes = f.readlines()
+        attributes = [x.strip() for x in attributes] 
+    else:
+        attributes = ["feature %d" % x for x in range(0, ncols)]
 
     log.info("computing relevance of %d attributes on %d samples ...", ncols, nrows)
 
@@ -49,7 +53,7 @@ def action_relevance(argc, argv):
     tot = 0
 
     for col in range(0, ncols):
-        log.info("computing relevance for attribute %s ...", attributes[col])
+        log.info("computing relevance for attribute [%d/%d] %s ...", col + 1, ncols, attributes[col])
 
         backup = prj.dataset.X[:,col].copy()
 
@@ -66,10 +70,19 @@ def action_relevance(argc, argv):
 
     deltas = sorted(deltas, key = lambda x: x[1], reverse = True)
 
-    log.info("\nRELEVANCE TABLE:\n")
-
+    num_irrelevant = 0
+    table = [("Feature", "Relevance")]
     for delta in deltas:
         col, d = delta
         relevance = (d / tot) * 100.0
         if relevance > 0:
-            log.info("%s : %.2f", attributes[col], relevance)
+            table.append((attributes[col], "%.2f%%" % relevance))
+        else:
+            num_irrelevant += 1
+
+    print("")
+    print(AsciiTable(table).table)
+    print("")
+
+    if num_irrelevant > 0:
+        log.info("%d features have 0 relevance.", num_irrelevant)
