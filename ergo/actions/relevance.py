@@ -90,14 +90,14 @@ def action_relevance(argc, argv):
 
         prj.restore_feature(col, backup_w, backup_b)
 
-    deltas = sorted(deltas, key = lambda x: x[1], reverse = True)
+    deltas = sorted(deltas, key = lambda x: abs(x[1]), reverse = True)
 
     num_irrelevant = 0
     table = [("Feature", "Relevance")]
     for delta in deltas:
         col, d = delta
-        relevance = (d / tot) * 100.0
-        if relevance > 0:
+        if d != 0.0:
+            relevance = (d / tot) * 100.0
             table.append((attributes[col], "%.2f%%" % relevance))
         else:
             num_irrelevant += 1
