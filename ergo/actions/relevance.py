@@ -55,23 +55,16 @@ def action_relevance(argc, argv):
     for col in range(0, ncols):
         log.info("computing relevance for attribute [%d/%d] %s ...", col + 1, ncols, attributes[col])
 
-        backup = prj.dataset.X[:,col].copy()
-        is_meaningful = backup.max() != backup.min()
+        backup_w, backup_b = prj.null_feature(col)
 
-        if is_meaningful:
-            prj.dataset.X[:,col] = 0
+        accu, cm = prj.accuracy_for(prj.dataset.X, prj.dataset.Y, repo_as_dict = True)
 
-            accu, cm = prj.accuracy_for(prj.dataset.X, prj.dataset.Y, repo_as_dict = True)
+        delta = ref_accu['weighted avg']['precision'] - accu['weighted avg']['precision']
+        tot += delta
 
-            delta = ref_accu['weighted avg']['precision'] - accu['weighted avg']['precision']
-            tot += delta
+        deltas.append((col, delta))
 
-            deltas.append((col, delta))
-
-            prj.dataset.X[:,col] = backup
-        else:
-            log.debug("skipping due to zero relevance")
-            deltas.append((col, 0))
+        prj.restore_feature(col, backup_w, backup_b)
 
     deltas = sorted(deltas, key = lambda x: x[1], reverse = True)
 

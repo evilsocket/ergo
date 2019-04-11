@@ -173,6 +173,25 @@ class Project(object):
         # save model accuracy statistics
         self._save_stats() 
 
+    def null_feature(self, idx):
+        input_layer = self.model.layers[0]
+        # get_weights returns a copy!
+        input_weights = input_layer.get_weights()
+        backup_w = input_weights[0][idx,:].copy()
+        backup_b = input_weights[1][idx].copy()
+        # set to 0 the weights and bias of this input column
+        input_weights[0][idx,:] = 0
+        input_weights[1][idx] = 0
+        input_layer.set_weights(input_weights)
+        return backup_w, backup_b
+
+    def restore_feature(self, idx, backup_w, backup_b):
+        input_layer = self.model.layers[0]
+        input_weights = input_layer.get_weights()
+        input_weights[0][idx,:] = backup_w
+        input_weights[1][idx] = backup_b
+        input_layer.set_weights(input_weights)
+
     def view(self):
         import matplotlib.pyplot as plt
         import matplotlib.image as mpimg
