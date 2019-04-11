@@ -14,6 +14,7 @@
 * scaffold new projects in seconds and customize only a minimum amount of code.
 * import and optimize CSV datasets and train the model with them.
 * visualize the model structure, loss and accuracy functions during training.
+* determine how each of the input features affects the accuracy by differential training.
 * export a simple REST API to use your models from a server.
 
 #### Installation
