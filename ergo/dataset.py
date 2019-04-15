@@ -14,8 +14,14 @@ from ergo.core.loader import Loader
 class Dataset(object):
     @staticmethod 
     def clean(path):
-        clean_if_exist(path, ('data-train.csv', 'data-test.csv', 'data-validation.csv'))
-        clean_if_exist(path, ('data-train.pkl', 'data-test.pkl', 'data-validation.pkl'))
+        data_files = ( \
+                'data-train.csv', 
+                'data-test.csv', 
+                'data-validation.csv', 
+                'data-train.pkl', 
+                'data-test.pkl', 
+                'data-validation.pkl')
+        clean_if_exist(path, data_files)
 
     @staticmethod
     def optimize(path, reuse = 0.15, output = None):
@@ -25,9 +31,12 @@ class Dataset(object):
     def split_row(row, n_labels, flat):
         x = row.iloc[:,1:].copy()
         if not flat:
+            # k = [ np.matrix(x.iloc[:,i][:]) for i in range(x.shape[1]) ]
+            # print (k[0][0].shape)
+            # print (k[0])
             x = [x[i].values for i in x.columns]
         y = to_categorical(row.values[:,0], n_labels)
-        return x, y
+        return k, y
 
     def __init__(self, path):
         self.path       = os.path.abspath(path)
@@ -39,7 +48,7 @@ class Dataset(object):
         self.do_save    = True
         self.is_flat    = True
         self.n_labels   = 0
-        self.train      = None
+        self.train      = None   
         self.test       = None
         self.validation = None
         self.X_train    = None
@@ -57,7 +66,7 @@ class Dataset(object):
                os.path.exists(self.valid_path)
 
     def _set_xys(self, for_training = True):
-        if for_training:
+        if for_training: 
             self.X_train, self.Y_train = Dataset.split_row(self.train, self.n_labels, self.is_flat)
             self.X_test,  self.Y_test  = Dataset.split_row(self.test, self.n_labels, self.is_flat)
             self.X_val,   self.Y_val   = Dataset.split_row(self.validation, self.n_labels, self.is_flat)
