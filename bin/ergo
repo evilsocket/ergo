@@ -77,7 +77,7 @@ def main():
             ACTIONS[action].cb(argc - 2, sys.argv[2:])
         except Exception as e:
             log.critical("%s", e)
-            # log.exception("\n\n")
+            log.exception("\n\n")
 
 if __name__ == '__main__':
     main()
