@@ -15,6 +15,7 @@ class Dataset(object):
     @staticmethod 
     def clean(path):
         clean_if_exist(path, ('data-train.csv', 'data-test.csv', 'data-validation.csv'))
+        clean_if_exist(path, ('data-train.pkl', 'data-test.pkl', 'data-validation.pkl'))
 
     @staticmethod
     def optimize(path, reuse = 0.15, output = None):
@@ -65,6 +66,14 @@ class Dataset(object):
             self.X, self.Y = Dataset.split_row(self.train, self.n_labels, self.is_flat)
 
     def load(self):
+        pkl_test = self.train_path.replace('.csv', '.pkl') 
+        if os.path.exists(pkt_test):
+            log.info("detected pickle encoded dataset")
+            self.is_flat = False
+            self.train_path = self.train_path.replace('.csv', '.pkl')
+            self.test_path = self.test_path.replace('.csv', '.pkl')
+            self.test_path = self.test_path.replace('.csv', '.pkl')
+
         self.loader.load()
         self._set_xys()
 

@@ -1,22 +1,27 @@
 import logging as log
 import pandas as pd
 import numpy as np
+import pickle
 import threading
 
 class Loader(object):
     def __init__(self, dataset):
         self.dataset = dataset
 
+    def _reader(self, path):
+        log.info("loading %s ..." % path)
+        if self.dataset.is_flat:
+            return pd.read_csv(path, sep = ',', header = None)
+        else:
+            return pickle.load( open( path, "rb" ) )
+
     def _worker(self, idx):
         if idx == 0:
-            log.info("loading %s ..." % self.dataset.train_path)
-            self.dataset.train = pd.read_csv(self.dataset.train_path, sep = ',', header = None)
+            self.dataset.train = self._reader(self.dataset.train_path)
         elif idx == 1:
-            log.info("loading %s ..." % self.dataset.test_path)
-            self.dataset.test = pd.read_csv(self.dataset.test_path, sep = ',', header = None)
+            self.dataset.test = self._reader(self.dataset.test_path)
         elif idx == 2:
-            log.info("loading %s ..." % self.dataset.valid_path)
-            self.dataset.validation = pd.read_csv(self.dataset.valid_path, sep = ',', header = None)
+            self.dataset.validation = self._reader(self.dataset.valid_path)
 
     def load(self):
         threads = ( \
