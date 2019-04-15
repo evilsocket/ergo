@@ -14,6 +14,9 @@ from keras import backend as K
 from keras.layers import Input
 from keras.models import Model, load_model
 
+import logging as log
+from ergo.project import Project
+
 __author__ = "Tobias Hermann"
 __copyright__ = "Copyright 2017, Tobias Hermann"
 __license__ = "MIT"
