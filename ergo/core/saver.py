@@ -1,5 +1,6 @@
 import threading
 import logging as log
+import pickle
 
 class Saver(object):
     def __init__(self, dataset):
@@ -7,16 +8,31 @@ class Saver(object):
         self.threads = None
 
     @staticmethod
-    def _worker(v, filename):
+    def _worker(v, filename, flat):
         log.info("saving %s ..." % filename)
-        v.to_csv(filename, sep = ',', header = None, index = None, chunksize=512)
+
+        if not flat:
+            pickle.dump( v, open( filename, "wb" ) )
+        else:
+            v.to_csv(filename, sep = ',', header = None, index = None, chunksize=512)
 
     def save(self):
+        train_path = self.dataset.train_path
+        test_path  = self.dataset.test_path
+        valid_path = self.dataset.valid_path
+        flat = self.dataset.is_flat
+
+        if not self.dataset.is_flat:
+            train_path = train_path.replace('.csv', '.pkl')
+            test_path = test_path.replace('.csv', '.pkl')
+            test_path = test_path.replace('.csv', '.pkl')
+
         self.threads = [ \
-          threading.Thread(target=Saver._worker, args=( self.dataset.train, self.dataset.train_path, )),
-          threading.Thread(target=Saver._worker, args=( self.dataset.test, self.dataset.test_path, )),
-          threading.Thread(target=Saver._worker, args=( self.dataset.validation, self.dataset.valid_path, )) 
+          threading.Thread(target=Saver._worker, args=( self.dataset.train, train_path, flat, )),
+          threading.Thread(target=Saver._worker, args=( self.dataset.test, test_path, flat, )),
+          threading.Thread(target=Saver._worker, args=( self.dataset.validation, valid_path, flat, )) 
         ]
+
         for t in self.threads:
             t.start()
     

@@ -21,8 +21,11 @@ class Dataset(object):
         optimize_dataset(path, reuse, output)
 
     @staticmethod
-    def split_row(row, n_labels):
+    def split_row(row, n_labels, flat):
         x = row.values[:,1:]
+        if not flat:
+            print("flat is %s" % flat)
+            x = [x[i].values for i in x.columns]
         y = to_categorical(row.values[:,0], n_labels)
         return x, y
 
@@ -34,6 +37,7 @@ class Dataset(object):
         self.saver      = Saver(self)
         self.loader     = Loader(self)
         self.do_save    = True
+        self.is_flat    = True
         self.n_labels   = 0
         self.train      = None
         self.test       = None
@@ -54,19 +58,37 @@ class Dataset(object):
 
     def _set_xys(self, for_training = True):
         if for_training:
-            self.X_train, self.Y_train = Dataset.split_row(self.train, self.n_labels)
-            self.X_test,  self.Y_test  = Dataset.split_row(self.test, self.n_labels)
-            self.X_val,   self.Y_val   = Dataset.split_row(self.validation, self.n_labels)
+            self.X_train, self.Y_train = Dataset.split_row(self.train, self.n_labels, self.is_flat)
+            self.X_test,  self.Y_test  = Dataset.split_row(self.test, self.n_labels, self.is_flat)
+            self.X_val,   self.Y_val   = Dataset.split_row(self.validation, self.n_labels, self.is_flat)
         else:
-            self.X, self.Y = Dataset.split_row(self.train, self.n_labels)
+            self.X, self.Y = Dataset.split_row(self.train, self.n_labels, self.is_flat)
 
     def load(self):
         self.loader.load()
         self._set_xys()
+
+    def _is_scalar(self, v):
+        try:
+            return not (len(v) >= 0)
+        except TypeError:
+            # TypeError: object of type 'X' has no len()
+            return True
+        except:
+            raise
     
     def source(self, data, p_test = 0.0, p_val = 0.0):
         # reset indexes and resample data just in case
         dataset = data.sample(frac = 1).reset_index(drop = True)
+
+        # check if the input vectors are made of scalars or other vectors
+        self.is_flat = True
+        for x in dataset[0]:
+            if not self._is_scalar(x):
+                log.info("detected non scalar input")
+                self.is_flat = False
+                break
+
         # count unique labels on first column
         self.n_labels = len(dataset.iloc[:,0].unique())
         # if both values are zero, we're just loading a single file,
