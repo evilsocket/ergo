@@ -23,7 +23,8 @@ class Dataset(object):
     @staticmethod
     def split_row(row, n_labels, flat):
         x = row.values[:,1:]
-        if not is flat:
+        if not flat:
+            print("flat is %s" % flat)
             x = [x[i].values for i in x.columns]
         y = to_categorical(row.values[:,0], n_labels)
         return x, y
@@ -57,11 +58,11 @@ class Dataset(object):
 
     def _set_xys(self, for_training = True):
         if for_training:
-            self.X_train, self.Y_train = Dataset.split_row(self.train, self.n_labels, self.dataset.is_flat)
-            self.X_test,  self.Y_test  = Dataset.split_row(self.test, self.n_labels, self.dataset.is_flat)
-            self.X_val,   self.Y_val   = Dataset.split_row(self.validation, self.n_labels, self.dataset.is_flat)
+            self.X_train, self.Y_train = Dataset.split_row(self.train, self.n_labels, self.is_flat)
+            self.X_test,  self.Y_test  = Dataset.split_row(self.test, self.n_labels, self.is_flat)
+            self.X_val,   self.Y_val   = Dataset.split_row(self.validation, self.n_labels, self.is_flat)
         else:
-            self.X, self.Y = Dataset.split_row(self.train, self.n_labels, self.dataset.is_flat)
+            self.X, self.Y = Dataset.split_row(self.train, self.n_labels, self.is_flat)
 
     def load(self):
         self.loader.load()
@@ -69,10 +70,10 @@ class Dataset(object):
 
     def _is_scalar(self, v):
         try:
-            return len(v) >= 0
+            return not (len(v) >= 0)
         except TypeError:
             # TypeError: object of type 'X' has no len()
-            return False
+            return True
         except:
             raise
     
