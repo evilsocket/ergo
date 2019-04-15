@@ -25,7 +25,7 @@ class Saver(object):
         if not self.dataset.is_flat:
             train_path = train_path.replace('.csv', '.pkl')
             test_path = test_path.replace('.csv', '.pkl')
-            test_path = test_path.replace('.csv', '.pkl')
+            valid_path = valid_path.replace('.csv', '.pkl')
 
         self.threads = [ \
           threading.Thread(target=Saver._worker, args=( self.dataset.train, train_path, flat, )),

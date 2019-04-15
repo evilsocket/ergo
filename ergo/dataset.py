@@ -23,9 +23,8 @@ class Dataset(object):
 
     @staticmethod
     def split_row(row, n_labels, flat):
-        x = row.values[:,1:]
+        x = row.iloc[:,1:].copy()
         if not flat:
-            print("flat is %s" % flat)
             x = [x[i].values for i in x.columns]
         y = to_categorical(row.values[:,0], n_labels)
         return x, y
@@ -94,7 +93,7 @@ class Dataset(object):
         self.is_flat = True
         for x in dataset.iloc[0,:]:
             if not self._is_scalar(x):
-                log.info("detected non scalar input")
+                log.info("detected non scalar input: %s", x.shape)
                 self.is_flat = False
                 break
 
