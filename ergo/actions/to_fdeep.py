@@ -809,5 +809,5 @@ def action_to_fdeep(argc, argv):
         log.error("no trained Keras model found for this projec")
         quit()
 
-    convert(prj.model, prj.fdeep_path)
+    convert(prj.weights_path, prj.fdeep_path)
 
