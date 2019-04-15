@@ -36,7 +36,7 @@ class Dataset(object):
             # print (k[0])
             x = [x[i].values for i in x.columns]
         y = to_categorical(row.values[:,0], n_labels)
-        return k, y
+        return x, y
 
     def __init__(self, path):
         self.path       = os.path.abspath(path)
