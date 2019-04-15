@@ -92,7 +92,7 @@ class Dataset(object):
 
         # check if the input vectors are made of scalars or other vectors
         self.is_flat = True
-        for x in dataset[0]:
+        for x in dataset.iloc[0,:]:
             if not self._is_scalar(x):
                 log.info("detected non scalar input")
                 self.is_flat = False
