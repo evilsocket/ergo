@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from keras.utils import to_categorical
+from collections.abc import Iterable
 
 from ergo.core.utils import clean_if_exist
 from ergo.core.optimizer import optimize_dataset
@@ -12,14 +13,14 @@ from ergo.core.saver import Saver
 from ergo.core.loader import Loader
 
 class Dataset(object):
-    @staticmethod 
+    @staticmethod
     def clean(path):
         data_files = ( \
-                'data-train.csv', 
-                'data-test.csv', 
-                'data-validation.csv', 
-                'data-train.pkl', 
-                'data-test.pkl', 
+                'data-train.csv',
+                'data-test.csv',
+                'data-validation.csv',
+                'data-train.pkl',
+                'data-test.pkl',
                 'data-validation.pkl')
         clean_if_exist(path, data_files)
 
@@ -31,10 +32,13 @@ class Dataset(object):
     def split_row(row, n_labels, flat):
         x = row.iloc[:,1:].copy()
         if not flat:
-            # k = [ np.matrix(x.iloc[:,i][:]) for i in range(x.shape[1]) ]
-            # print (k[0][0].shape)
-            # print (k[0])
-            x = [x[i].values for i in x.columns]
+            if len(row) == 1:
+                # this check is to prevent the list comprehension to fail
+                # shouldn't happen in production but can fail on test
+                log.error("Dataset size must be greater than 1")
+                quit()
+            x = [ np.squeeze(np.array( [ x[i][:]] ), axis = 0)
+                   for i in x.columns ]
         y = to_categorical(row.values[:,0], n_labels)
         return x, y
 
@@ -48,7 +52,7 @@ class Dataset(object):
         self.do_save    = True
         self.is_flat    = True
         self.n_labels   = 0
-        self.train      = None   
+        self.train      = None
         self.test       = None
         self.validation = None
         self.X_train    = None
@@ -66,7 +70,7 @@ class Dataset(object):
                os.path.exists(self.valid_path)
 
     def _set_xys(self, for_training = True):
-        if for_training: 
+        if for_training:
             self.X_train, self.Y_train = Dataset.split_row(self.train, self.n_labels, self.is_flat)
             self.X_test,  self.Y_test  = Dataset.split_row(self.test, self.n_labels, self.is_flat)
             self.X_val,   self.Y_val   = Dataset.split_row(self.validation, self.n_labels, self.is_flat)
@@ -74,7 +78,7 @@ class Dataset(object):
             self.X, self.Y = Dataset.split_row(self.train, self.n_labels, self.is_flat)
 
     def load(self):
-        pkl_test = self.train_path.replace('.csv', '.pkl') 
+        pkl_test = self.train_path.replace('.csv', '.pkl')
         if os.path.exists(pkt_test):
             log.info("detected pickle encoded dataset")
             self.is_flat = False
@@ -93,7 +97,7 @@ class Dataset(object):
             return True
         except:
             raise
-    
+
     def source(self, data, p_test = 0.0, p_val = 0.0):
         # reset indexes and resample data just in case
         dataset = data.sample(frac = 1).reset_index(drop = True)
@@ -112,8 +116,8 @@ class Dataset(object):
         # otherwise we want to generate training temporary datasets.
         for_training = p_test > 0.0 and p_val > 0.0
         if for_training:
-            log.info("generating train, test and validation datasets (test=%f validation=%f) ...", 
-                    p_test, 
+            log.info("generating train, test and validation datasets (test=%f validation=%f) ...",
+                    p_test,
                     p_val)
 
             n_tot   = len(dataset)
