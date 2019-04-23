@@ -18,12 +18,7 @@
 
 #### Installation
 
-Download the [latest stable release](https://github.com/evilsocket/ergo/releases), extract and:
-
-    cd /path/to/ergo
-    sudo pip3 install -r requirements.txt
-    python3 setup.py build
-    sudo python3 setup.py install
+    sudo pip3 install ergo-nn
 
 ##### Enable GPU support
 
@@ -31,6 +26,16 @@ Make sure you have [CUDA 9.0 and cuDNN 7.0 installed](https://medium.com/@zhanwe
 
     sudo pip3 uninstall tensorflow
     sudo pip3 install tensorflow-gpu
+
+#### Building from Source
+
+Download the [latest stable release](https://github.com/evilsocket/ergo/releases), extract and:
+
+    git clone https://github.com/evilsocket/ergo.git
+    cd ergo
+    sudo pip3 install -r requirements.txt
+    python3 setup.py build
+    sudo python3 setup.py install
 
 #### Usage
 
