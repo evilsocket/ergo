@@ -6,7 +6,6 @@
   </p>
 </p>
 
-
 `ergo` (from the Latin sentence *["Cogito ergo sum"](https://en.wikipedia.org/wiki/Cogito,_ergo_sum)*) is a tool that makes deep learning with [Keras](https://keras.io/) easier. 
 
 **It can be used to**: 
@@ -66,10 +65,6 @@ Now it's time to visualize the model structure and how the the `accuracy` and `l
     
     ergo view example
 
-You can use the `relevance` command to evaluate the model on a given set (or a subset of it, see `--ratio 0.1`) by nulling one attribute at a time and measuring how that influenced the accuracy (`feature.names` is an optional file with the names of the attributes, one per line):
-
-    ergo relevance example --dataset /some/path/data.csv --attributes /some/path/feature.names --ratio 0.1
-
 Once you're done, you can remove the train, test and validation temporary datasets with:
 
     ergo clean example
@@ -86,6 +81,10 @@ To reset the state of a project (**WARNING**: this will remove the datasets, the
 
 ##### Other commands
 
+You can use the `relevance` command to evaluate the model on a given set (or a subset of it, see `--ratio 0.1`) by nulling one attribute at a time and measuring how that influenced the accuracy (`feature.names` is an optional file with the names of the attributes, one per line):
+
+    ergo relevance example --dataset /some/path/data.csv --attributes /some/path/feature.names --ratio 0.1
+
 Evaluate and compare the performances of two trained models on a given dataset and (optionally) output the differences to a json file:
 
     ergo cmp example_a example_b --dataset /path/to/data.csv --to-json diffs.json
@@ -100,5 +99,5 @@ Convert the Keras model to [frugally-deep](https://github.com/Dobiasd/frugally-d
 
 #### License
 
-`ergo` was made with ♥  by [Simone Margaritelli](https://www.evilsocket.net/) and it is released under the GPL 3 license.
+`ergo` was made with ♥  by [the dev team](https://github.com/evilsocket/ergo/graphs/contributors) and it is released under the GPL 3 license.
 

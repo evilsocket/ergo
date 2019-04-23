@@ -173,6 +173,9 @@ class Project(object):
         # save model accuracy statistics
         self._save_stats() 
 
+    """
+    unused, zeroing the dataset is better and model agnostic
+
     def null_feature(self, idx):
         input_layer = self.model.layers[0]
         # get_weights returns a copy!
@@ -191,6 +194,7 @@ class Project(object):
         input_weights[0][idx,:] = backup_w
         input_weights[1][idx] = backup_b
         input_layer.set_weights(input_weights)
+    """
 
     def view(self):
         import matplotlib.pyplot as plt

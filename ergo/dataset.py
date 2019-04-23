@@ -88,8 +88,8 @@ class Dataset(object):
 
         self.loader.load()
         self._set_xys()
-
-    def _is_scalar(self, v):
+    
+    def _is_scalar_value(self, v):
         try:
             return not (len(v) >= 0)
         except TypeError:
@@ -105,7 +105,7 @@ class Dataset(object):
         # check if the input vectors are made of scalars or other vectors
         self.is_flat = True
         for x in dataset.iloc[0,:]:
-            if not self._is_scalar(x):
+            if not self._is_scalar_value(x):
                 log.info("detected non scalar input: %s", x.shape)
                 self.is_flat = False
                 break
@@ -135,3 +135,18 @@ class Dataset(object):
             self.train = dataset
 
         self._set_xys(for_training)
+
+    def subsample(self, ratio):
+        X = self.X.values if self.is_flat else self.X
+        y = self.Y
+        if ratio < 1.0:
+            log.info("selecting a randomized sample of %d%% ...", ratio * 100)
+
+            tot_rows = X.shape[0] if self.is_flat else X[0].shape[0]
+            num      = int(tot_rows * args.ratio)
+            indexes  = np.random.choice(tot_rows, num, replace = False)
+
+            X = X[indexes] if self.is_flat else [ i[indexes] for i in X ]
+            y = y[indexes]
+
+        return X, y

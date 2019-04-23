@@ -25,6 +25,33 @@ def parse_args(argv):
     validate_args(args)
     return args
 
+def get_attributes(filename):
+    attributes = []
+    if filename is not None:
+        with open(filename) as f:
+            attributes = f.readlines()
+        attributes = [name.strip() for name in attributes]
+    else:
+        attributes = ["feature %d" % i for i in range(0, ncols)]
+
+    return attributes
+
+def zeroize_feature(X, col, is_scalar_input):
+    if is_scalar_input:
+        backup = X[:, col].copy()
+        X[:,col] = 0
+    else:
+        backup = X[col].copy()
+        X[col] = np.zeros_like(backup)
+
+    return backup
+
+def restore_feature(X, col, backup, is_scalar_input):
+    if is_scalar_input:
+        X[:,col] = backup
+    else:
+        X[col] = backup
+
 def action_relevance(argc, argv):
     if argc < 3:
         usage()
@@ -41,83 +68,46 @@ def action_relevance(argc, argv):
 
     prj.prepare(args.dataset, 0.0, 0.0)
 
-    X = prj.dataset.X
-    y = prj.dataset.Y
-
-    if type(X) == list:
-        num = int(X[0].shape[0] * args.ratio)
-    else:
-        num = int(X.shape[0] * args.ratio)
-        X = X.values
-
-    if args.ratio < 1.0:
-        log.info("selecting a randomized sample of %d%% ...", args.ratio * 100)
-        if type(X) == list:
-            indexes = np.random.choice(X[0].shape[0], num, replace = False)
-            nX = [ i[indexes] for i in X ]
-            X = nX
-        else:
-            indexes = np.random.choice(X.shape[0], num, replace = False)
-            X = X[indexes]
-        y = y[indexes]
-
-    if type(X) == list:
-        nrows, ncols = X[0].shape[0], len(X)
-    else:
-        nrows, ncols = X.shape
-
-    attributes = []
-    if args.attributes is not None:
-        with open(args.attributes) as f:
-            attributes = f.readlines()
-        attributes = [name.strip() for name in attributes]
-    else:
-        attributes = ["feature %d" % i for i in range(0, ncols)]
+    attributes   = get_attributes(args.attributes)
+    X, y         = prj.dataset.subsample(args.ratio)
+    nrows, ncols = X.shape if prj.dataset.is_flat else (X[0].shape[0], len(X))
 
     log.info("computing relevance of %d attributes on %d samples ...", ncols, nrows)
 
     ref_accu, ref_cm = prj.accuracy_for(X, y, repo_as_dict = True)
-    deltas = []
-    tot = 0
-    speed = 0.0
+    deltas           = []
+    tot              = 0
+    speed            = 0.0
 
     for col in range(0, ncols):
         log.info("[%.2f evals/s] computing relevance for attribute [%d/%d] %s ...", speed, col + 1, ncols, attributes[col])
 
-        if type(X) == list:
-            backup_col = X[col].copy()
-            X[col] = np.zeros_like(X[col])
-        else:
-            backup_col = X[:, col].copy()
-            X[:,col] = 0
+        backup = zeroize_feature(X, col, prj.dataset.is_flat)
 
         start = time.time()
 
         accu, cm = prj.accuracy_for(X, y, repo_as_dict = True)
 
-        end = time.time()
-
-        speed = 1.0 / (end - start)
+        speed = 1.0 / (time.time() - start)
 
         delta = ref_accu['weighted avg']['precision'] - accu['weighted avg']['precision']
-        tot += delta
+        tot  += delta
 
         deltas.append((col, delta))
 
-        if type(X) == list:
-            X[col] = backup_col
-        else:
-            X[:,col] = backup_col
+        restore_feature(X, col, backup, prj.dataset.is_flat)
 
     deltas = sorted(deltas, key = lambda x: abs(x[1]), reverse = True)
 
     num_irrelevant = 0
-    table = [("Feature", "Relevance")]
+    table = [("Column", "Feature", "Relevance")]
     for delta in deltas:
         col, d = delta
         if d != 0.0:
             relevance = (d / tot) * 100.0
-            table.append((attributes[col], "%.2f%%" % relevance))
+            row       = ("%d" % col, attributes[col], "%.2f%%" % relevance)
+            row       = ["\033[31m%s\033[0m" % e for e in row] if relevance < 0.0 else row
+            table.append(row)
         else:
             num_irrelevant += 1
 
