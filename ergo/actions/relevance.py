@@ -41,25 +41,35 @@ def action_relevance(argc, argv):
 
     prj.prepare(args.dataset, 0.0, 0.0)
 
-
-
     X = prj.dataset.X
     y = prj.dataset.Y
-    num = int(X.shape[0] * args.ratio)
+
+    if type(X) == list:
+        num = int(X[0].shape[0] * args.ratio)
+    else:
+        num = int(X.shape[0] * args.ratio)
 
     if args.ratio < 1.0:
         log.info("selecting a randomized sample of %d%% ...", args.ratio * 100)
-        indexes = np.random.choice(X.shape[0], num, replace = False)
-        X = X[indexes]
+        if type(X) == list:
+            indexes = np.random.choice(X[0].shape[0], num, replace = False)
+            nX = [ i[indexes] for i in X ]
+            X = nX
+        else:
+            indexes = np.random.choice(X.shape[0], num, replace = False)
+            X = X[indexes]
         y = y[indexes]
 
-    nrows, ncols = X.shape
-    attributes = []
+    if type(X) == list:
+        nrows, ncols = X[0].shape[0], len(X)
+    else:
+        nrows, ncols = X.shape
 
+    attributes = []
     if args.attributes is not None:
         with open(args.attributes) as f:
             attributes = f.readlines()
-        attributes = [name.strip() for name in attributes] 
+        attributes = [name.strip() for name in attributes]
     else:
         attributes = ["feature %d" % i for i in range(0, ncols)]
 
@@ -73,7 +83,12 @@ def action_relevance(argc, argv):
     for col in range(0, ncols):
         log.info("[%.2f evals/s] computing relevance for attribute [%d/%d] %s ...", speed, col + 1, ncols, attributes[col])
 
-        backup_w, backup_b = prj.null_feature(col)
+        if type(X) == list:
+            backup_col = X[col].copy()
+            X[col] = np.zeros_like(X[col])
+        else:
+            backup_col = X[:, col].copy()
+            X[:, col] = 0
 
         start = time.time()
 
@@ -88,7 +103,10 @@ def action_relevance(argc, argv):
 
         deltas.append((col, delta))
 
-        prj.restore_feature(col, backup_w, backup_b)
+        if type(X) == list:
+            X[col] = backup_col
+        else:
+            X[:,col] = backup_col
 
     deltas = sorted(deltas, key = lambda x: abs(x[1]), reverse = True)
 
