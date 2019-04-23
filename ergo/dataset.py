@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 
 from keras.utils import to_categorical
-from collections.abc import Iterable
 
 from ergo.core.utils import clean_if_exist
 from ergo.core.optimizer import optimize_dataset
