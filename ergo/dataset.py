@@ -142,7 +142,7 @@ class Dataset(object):
             log.info("selecting a randomized sample of %d%% ...", ratio * 100)
 
             tot_rows = X.shape[0] if self.is_flat else X[0].shape[0]
-            num      = int(tot_rows * args.ratio)
+            num      = int(tot_rows * ratio)
             indexes  = np.random.choice(tot_rows, num, replace = False)
 
             X = X[indexes] if self.is_flat else [ i[indexes] for i in X ]
