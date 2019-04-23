@@ -3,18 +3,14 @@ from ergo.version import __version__, __author__, __email__, __license__
 
 import os
 
-try:
-    long_description = open( 'README.md', 'rt' ).read()
-    ctype = 'text/markdown'
-except:
-    long_description = 'ergo is a tool that makes deep learning with Keras easier.'
-    ctype = 'text/plain'
+
+desc = 'ergo is a tool that makes deep learning with Keras easier.'
 
 setup( name                 = 'ergo-nn',
        version              = __version__,
-       description          = long_description,
-       long_description     = long_description,
-       long_description_content_type = ctype,
+       description          = desc,
+       long_description     = desc,
+       long_description_content_type = 'text/plain',
        author               = __author__,
        author_email         = __email__,
        url                  = 'http://www.github.com/evilsocket/ergo',
