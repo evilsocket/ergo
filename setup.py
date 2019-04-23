@@ -10,7 +10,7 @@ except:
     long_description = 'ergo is a tool that makes deep learning with Keras easier.'
     ctype = 'text/plain'
 
-setup( name                 = 'ergo',
+setup( name                 = 'ergo-nn',
        version              = __version__,
        description          = long_description,
        long_description     = long_description,
