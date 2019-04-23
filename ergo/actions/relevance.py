@@ -48,6 +48,7 @@ def action_relevance(argc, argv):
         num = int(X[0].shape[0] * args.ratio)
     else:
         num = int(X.shape[0] * args.ratio)
+        X = X.values
 
     if args.ratio < 1.0:
         log.info("selecting a randomized sample of %d%% ...", args.ratio * 100)
@@ -88,7 +89,7 @@ def action_relevance(argc, argv):
             X[col] = np.zeros_like(X[col])
         else:
             backup_col = X[:, col].copy()
-            X[:, col] = 0
+            X[:,col] = 0
 
         start = time.time()
 
