@@ -41,7 +41,7 @@ def action_relevance(argc, argv):
 
     prj.prepare(args.dataset, 0.0, 0.0)
 
-    print(len(prj.dataset.X))
+    print(len(prj.dataset.X[0]))
     X = np.matrix(prj.dataset.X)
     y = np.array(prj.dataset.Y)
 
