@@ -25,7 +25,7 @@ def parse_args(argv):
     validate_args(args)
     return args
 
-def get_attributes(filename):
+def get_attributes(filename, ncols):
     attributes = []
     if filename is not None:
         with open(filename) as f:
@@ -68,9 +68,9 @@ def action_relevance(argc, argv):
 
     prj.prepare(args.dataset, 0.0, 0.0)
 
-    attributes   = get_attributes(args.attributes)
     X, y         = prj.dataset.subsample(args.ratio)
     nrows, ncols = X.shape if prj.dataset.is_flat else (X[0].shape[0], len(X))
+    attributes   = get_attributes(args.attributes, ncols)
 
     log.info("computing relevance of %d attributes on %d samples ...", ncols, nrows)
 
