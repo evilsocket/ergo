@@ -74,10 +74,12 @@ def action_relevance(argc, argv):
 
     log.info("computing relevance of %d attributes on %d samples ...", ncols, nrows)
 
+    start = time.time()
+
     ref_accu, ref_cm = prj.accuracy_for(X, y, repo_as_dict = True)
     deltas           = []
     tot              = 0
-    speed            = 0.0
+    speed            = (1.0 / (time.time() - start)) * nrows
 
     for col in range(0, ncols):
         log.info("[%.2f evals/s] computing relevance for attribute [%d/%d] %s ...", speed, col + 1, ncols, attributes[col])
@@ -88,7 +90,7 @@ def action_relevance(argc, argv):
 
         accu, cm = prj.accuracy_for(X, y, repo_as_dict = True)
 
-        speed = 1.0 / (time.time() - start)
+        speed = (1.0 / (time.time() - start)) * nrows
 
         delta = ref_accu['weighted avg']['precision'] - accu['weighted avg']['precision']
         tot  += delta
