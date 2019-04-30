@@ -18,7 +18,7 @@
 
 #### Installation
 
-    sudo pip3 install ergo-nn
+    sudo pip3 install ergo-ai
 
 ##### Enable GPU support
 

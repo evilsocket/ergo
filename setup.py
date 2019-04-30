@@ -6,7 +6,7 @@ import os
 
 desc = 'ergo is a tool that makes deep learning with Keras easier.'
 
-setup( name                 = 'ergo-nn',
+setup( name                 = 'ergo-ai',
        version              = __version__,
        description          = desc,
        long_description     = desc,
