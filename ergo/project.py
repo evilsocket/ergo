@@ -188,6 +188,8 @@ class Project(object):
         else:
             data = self._from_file(source)
 
+        log.info("data shape: %s", data.shape)
+
         return self.dataset.source(data, p_test, p_val)
 
     def train(self, gpus):
