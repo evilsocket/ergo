@@ -15,7 +15,7 @@ def usage():
     quit()
 
 def validate_args(args):
-    if args.dataset is not None and not os.path.exists(args.dataset):
+    if args.dataset is not None and (not args.dataset.startswith('sum://') and not os.path.exists(args.dataset)):
         log.error("file %s does not exist" % args.dataset)
         quit()
 

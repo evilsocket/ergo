@@ -60,6 +60,10 @@ After defining the model structure and the training process, you can import a CS
 
     ergo train example --dataset /some/path/data.csv --gpus 2
 
+Or alternatively, start training and use a [sum database](https://github.com/evilsocket/sum) running on `localhost:50051` as a data source (and use `/etc/sumd/creds/cert.pem` for credentials):
+
+    ergo train example --dataset sum:///etc/sumd/creds/cert.pem@localhost:50051
+
 This will split the dataset into a train, validation and test sets (partitioned with the `--test` and `--validation` arguments) and start the training.
 
 If you want to update a model and/or train it on already imported data, you can simply:

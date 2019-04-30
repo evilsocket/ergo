@@ -1,14 +1,18 @@
 import os
 import sys
 import json
+import re
 import logging as log
 
 import numpy as np
+import pandas as pd
 from sklearn.metrics import classification_report, confusion_matrix
 
 from keras.models import model_from_yaml, load_model
 from keras.utils.vis_utils import plot_model
 from keras.utils.training_utils import multi_gpu_model
+
+import sumpy
 
 from ergo.core.logic import Logic
 from ergo.core.utils import clean_if_exist
@@ -142,9 +146,48 @@ class Project(object):
         with open(self.stats_path, 'w') as fp:
             self._out_stats(fp)
 
-    def prepare(self, filename, p_test, p_val):
+    def _from_file(self, filename):
         log.info("preparing data from %s ...", filename)
-        data = self.logic.prepare_dataset(filename)
+        return self.logic.prepare_dataset(filename)
+
+    def _from_sum(self, source):
+        m = re.findall(r"^sum:\/\/([^@]+)@([^:]+:\d+)$", source)
+        if m is None:
+            raise Exception("no valid source provided, format is: 'sum:///etc/sumd/creds/cert.pem@localhost:50051'")
+
+        conn = m[0][1]
+        cert = m[0][0]
+
+        log.info("connecting to sumd instance %s using certificate %s ...", conn, cert)
+        
+        size = 100 * 1024 * 1024
+        opts = [('grpc.max_send_message_length', size), ('grpc.max_receive_message_length', size)]
+
+        cli      = sumpy.Client(conn, cert, opts=opts)
+        per_page = 4096
+        count    = cli.list_records(0, per_page)
+        left     = count.total
+        page     = 1
+        data     = []
+
+        log.info("fetching %d records (%d pages)...", count.total, count.pages)
+
+        while left > 0:
+            log.debug("  page %d/%d (left %d records)", page, count.pages, left)
+            resp = cli.list_records(page, per_page)
+            page += 1
+            for r in resp.records:
+                data.append(r.data)
+                left -= 1
+
+        return pd.DataFrame(data)
+
+    def prepare(self, source, p_test, p_val):
+        if source.startswith('sum://'):
+            data = self._from_sum(source)
+        else:
+            data = self._from_file(source)
+
         return self.dataset.source(data, p_test, p_val)
 
     def train(self, gpus):
