@@ -98,13 +98,17 @@ Evaluate and compare the performances of two trained models on a given dataset a
 
     ergo cmp example_a example_b --dataset /path/to/data.csv --to-json diffs.json
 
-Optimize a dataset (get unique rows and reuse 15% of the total samples, customize ratio with the `--reuse-ratio` argument, customize output with `--output`):
+Freeze the graph and convert the model to the [TensorFlow](https://www.tensorflow.org/) protobuf format:
 
-    ergo optimize-dataset /some/path/data.csv
+    ergo to-tf example
 
 Convert the Keras model to [frugally-deep](https://github.com/Dobiasd/frugally-deep) format:
 
     ergo to-fdeep example
+
+Optimize a dataset (get unique rows and reuse 15% of the total samples, customize ratio with the `--reuse-ratio` argument, customize output with `--output`):
+
+    ergo optimize-dataset /some/path/data.csv
 
 #### License
 

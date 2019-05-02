@@ -28,6 +28,7 @@ from ergo.actions.compare import action_compare
 from ergo.actions.relevance import action_relevance
 from ergo.actions.serve import action_serve
 from ergo.actions.to_fdeep import action_to_fdeep
+from ergo.actions.to_tf import action_to_tf
 
 def get_pad(l):
     pad = 0
@@ -58,7 +59,8 @@ ACTIONS = collections.OrderedDict([
     ("cmp", Action("cmp", "Evaluate performances of two models against a given dataset.", action_compare)),
     ("relevance", Action("relevance", "Run evaluation several times by nulling feature by feature and returning the relevance of each one.", action_relevance)),
     ("serve", Action("serve", "Serve a pretrained model via a REST API.", action_serve)),
-    ("to-fdeep", Action("to-fdeep", "Convert a Keras model to fdeep format.", action_to_fdeep))
+    ("to-fdeep", Action("to-fdeep", "Convert a Keras model to fdeep format.", action_to_fdeep)),
+    ("to-tf", Action("to-tf", "Convert a Keras model to TensorFlow protobuf format by freezing its graph.", action_to_tf)),
 ])
 
 def main():
