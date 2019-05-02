@@ -16,7 +16,7 @@
 * determine how each of the input features affects the accuracy by differential training.
 * export a simple REST API to use your models from a server.
 
-#### Installation
+### Installation
 
     sudo pip3 install ergo-ai
 
@@ -37,7 +37,7 @@ Download the [latest stable release](https://github.com/evilsocket/ergo/releases
     python3 setup.py build
     sudo python3 setup.py install
 
-#### Usage
+### Creating a Project
 
 Start by printing the available actions by running `ergo help`, you can also print the software version (ergo, keras 
 and tensorflow versions) and some hardware info with `ergo info` to verify your installation. 
@@ -56,6 +56,8 @@ By default, ergo will simply read the dataset as a CSV file, build a small neura
 each and 2 outputs and use a pretty standard training algorithm. **You can see a complete (and more complex) example on the [planes-detector](https://github.com/evilsocket/ergo-planes-detector) 
 project repository**.
 
+### Training
+
 After defining the model structure and the training process, you can import a CSV dataset (first column must be the label) and start training using 2 GPUs:
 
     ergo train example --dataset /some/path/data.csv --gpus 2
@@ -70,9 +72,15 @@ If you want to update a model and/or train it on already imported data, you can 
 
     ergo train example --gpus 2
 
+### Testing and Inference
+
 Now it's time to visualize the model structure and how the the `accuracy` and `loss` metrics changed during training (requires `sudo apt-get install graphviz python3-tk`):
     
     ergo view example
+
+You can use the `relevance` command to evaluate the model on a given set (or a subset of it, see `--ratio 0.1`) by nulling one attribute at a time and measuring how that influenced the accuracy (`feature.names` is an optional file with the names of the attributes, one per line):
+
+    ergo relevance example --dataset /some/path/data.csv --attributes /some/path/feature.names --ratio 0.1
 
 Once you're done, you can remove the train, test and validation temporary datasets with:
 
@@ -88,11 +96,7 @@ To reset the state of a project (**WARNING**: this will remove the datasets, the
 
     ergo clean example --all
 
-##### Other commands
-
-You can use the `relevance` command to evaluate the model on a given set (or a subset of it, see `--ratio 0.1`) by nulling one attribute at a time and measuring how that influenced the accuracy (`feature.names` is an optional file with the names of the attributes, one per line):
-
-    ergo relevance example --dataset /some/path/data.csv --attributes /some/path/feature.names --ratio 0.1
+### Other commands
 
 Evaluate and compare the performances of two trained models on a given dataset and (optionally) output the differences to a json file:
 
@@ -110,7 +114,7 @@ Optimize a dataset (get unique rows and reuse 15% of the total samples, customiz
 
     ergo optimize-dataset /some/path/data.csv
 
-#### License
+### License
 
 `ergo` was made with ♥  by [the dev team](https://github.com/evilsocket/ergo/graphs/contributors) and it is released under the GPL 3 license.
 
