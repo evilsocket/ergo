@@ -78,7 +78,7 @@ class Dataset(object):
 
     def load(self):
         pkl_test = self.train_path.replace('.csv', '.pkl')
-        if os.path.exists(pkt_test):
+        if os.path.exists(pkl_test):
             log.info("detected pickle encoded dataset")
             self.is_flat = False
             self.train_path = self.train_path.replace('.csv', '.pkl')
