@@ -3,7 +3,7 @@ __email__     = 'evilsocket@gmail.com'
 __copyright__ = 'Copyright 2019, Simone Margaritelli'
 __credits__   = ['Nico Chiaraviglio', 'waxwing']
 __license__   = 'GPL'
-__version__   = '1.6.1'
+__version__   = '1.7.0'
 __status__    = 'Production'
 
 banner = """
