@@ -95,14 +95,14 @@ class Project(object):
 
         else:
             self.model = self.logic.builder(True)
-                
+
         if os.path.exists(self.history_path):
             log.debug("loading history from %s ...", self.history_path)
             with open(self.history_path, 'r') as fp:
                 self.history = json.loads(fp.read())
-        
+
         return None
-    
+
     def accuracy_for(self, X, Y, repo_as_dict = False):
         Y_tpred = np.argmax(self.model.predict(X), axis = 1)
         repo    = classification_report(np.argmax(Y, axis = 1), Y_tpred, output_dict = repo_as_dict)
@@ -113,8 +113,8 @@ class Project(object):
         train, tr_cm = self.accuracy_for(self.dataset.X_train, self.dataset.Y_train)
         test,  ts_cm = self.accuracy_for(self.dataset.X_test, self.dataset.Y_test)
         val,  val_cm = self.accuracy_for(self.dataset.X_val, self.dataset.Y_val)
-        return {'train': (train, tr_cm), 
-                'test': (test, ts_cm), 
+        return {'train': (train, tr_cm),
+                'test': (test, ts_cm),
                 'val': (val, val_cm)}
 
     def _save_model(self):
@@ -128,7 +128,7 @@ class Project(object):
     def _save_history(self):
         log.info("updating %s ...", self.history_path)
         with open(self.history_path, 'w') as fp:
-            json.dump(self.history, fp) 
+            json.dump(self.history, fp)
 
     def _out_stats(self, where):
         for who, header in self.what.items():
@@ -159,7 +159,7 @@ class Project(object):
         cert = m[0][0]
 
         log.info("connecting to sumd instance %s using certificate %s ...", conn, cert)
-        
+
         size = 100 * 1024 * 1024
         opts = [('grpc.max_send_message_length', size), ('grpc.max_receive_message_length', size)]
 
@@ -182,7 +182,7 @@ class Project(object):
 
         return pd.DataFrame(data)
 
-    def prepare(self, source, p_test, p_val):
+    def prepare(self, source, p_test, p_val, shuffle = True):
         if source.startswith('sum://'):
             data = self._from_sum(source)
         else:
@@ -190,12 +190,12 @@ class Project(object):
 
         log.info("data shape: %s", data.shape)
 
-        return self.dataset.source(data, p_test, p_val)
+        return self.dataset.source(data, p_test, p_val, shuffle)
 
     def train(self, gpus):
         # async datasets saver might be running, wait before training
         self.dataset.saver.wait()
-        
+
         # train
         if self.model is None:
             self.model = self.logic.builder(True)
@@ -206,7 +206,7 @@ class Project(object):
             to_train = multi_gpu_model(self.model, gpus=gpus)
 
         self.history  = self.logic.trainer(to_train, self.dataset).history
-        self.accu     = self.accuracy() 
+        self.accu     = self.accuracy()
 
         print("")
         self._out_stats(sys.stdout)
@@ -216,7 +216,7 @@ class Project(object):
         # save training history
         self._save_history()
         # save model accuracy statistics
-        self._save_stats() 
+        self._save_stats()
 
     """
     unused, zeroing the dataset is better and model agnostic
@@ -248,9 +248,9 @@ class Project(object):
         if self.model is not None:
             self.model.summary()
             log.info("saving model to %s ...", self.model_img_path)
-            plot_model( self.model, 
+            plot_model( self.model,
                     to_file = self.model_img_path,
-                    show_shapes = True, 
+                    show_shapes = True,
                     show_layer_names = True)
             img = mpimg.imread(self.model_img_path)
             plt.figure()
@@ -266,7 +266,7 @@ class Project(object):
             plt.ylabel('Accuracy')
             plt.xlabel('Epoch')
             plt.legend(['Train', 'Test'], loc='lower right')
-            
+
             # Plot training & validation loss values
             plt.subplot(2,1,2)
             plt.plot(self.history['loss'])
@@ -277,7 +277,7 @@ class Project(object):
             plt.legend(['Train', 'Test'], loc='upper right')
 
             plt.tight_layout()
-        
+
         plt.show()
 
 

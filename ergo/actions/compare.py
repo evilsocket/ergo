@@ -3,6 +3,7 @@ import json
 import argparse
 import logging as log
 import numpy as np
+import tempfile
 
 from terminaltables import AsciiTable
 
@@ -27,8 +28,51 @@ def green(s):
 
 # https://stackoverflow.com/questions/11942364/typeerror-integer-is-not-json-serializable-when-serializing-json-in-python
 def default(o):
-    if isinstance(o, np.int64): return int(o)  
+    if isinstance(o, np.int64): return int(o)
     raise TypeError
+
+
+def generate_reduced_dataset(dataset, size = 10):
+    temp_name = next(tempfile._get_candidate_names())
+    tmpfile = open(temp_name, 'w')
+    count = 0
+    with open(dataset, 'r') as inpfile:
+        for line in inpfile: count += 1
+
+    size = min(count, 100)
+    size = max(count // 100, size)
+    log.info("creating temporal file %s of size %d", temp_name, size)
+
+    with open(dataset,'r') as inpfile:
+        p = float(size)/ count
+        # assuming header:
+        tmpfile.write(inpfile.readline())
+        for i in inpfile:
+            line = inpfile.readline()
+            if np.random.random() < p:
+                tmpfile.write(line)
+    tmpfile.close()
+    return temp_name
+
+def are_preparation_equal(projects, dataset):
+    inp_shape = None
+    for prj in projects:
+        if inp_shape is None:
+            inp_shape = prj.model.input_shape
+        elif inp_shape != prj.model.input_shape:
+            return False
+        prj.prepare(dataset, 0.0, 0.0, False)
+    return compare_datasets(projects[0].dataset, projects[1].dataset)
+
+
+def compare_datasets(ds1, ds2):
+    if ds1.is_flat:
+        return np.array_equal(ds1.X, ds2.X)
+    for i,j in zip(ds1.X, ds2.X):
+        if not np.array_equal(i, j):
+            return False
+    return True
+
 
 def action_compare(argc, argv):
     if argc < 4:
@@ -43,6 +87,8 @@ def action_compare(argc, argv):
     ref       = None
     inp_shape = None
     out_shape = None
+    is_prepared = None
+    prjs = []
 
     for path in projects:
         prj = Project(path)
@@ -50,35 +96,45 @@ def action_compare(argc, argv):
         if err is not None:
             log.error("error while loading project %s: %s", path, err)
             quit()
-
-        if inp_shape is None:
-            inp_shape = prj.model.input_shape
-
-        elif inp_shape != prj.model.input_shape:
-            log.error("model %s input shape is %s, expected %s", path, prj.model.input_shape, inp_shape)
-            quit()
-
+        prjs.append(prj)
+        if not is_prepared:
+            is_prepared = True
+        else:
+            small_dataset = generate_reduced_dataset(args.dataset)
+            are_equal = are_preparation_equal(prjs, small_dataset)
+            log.info("deleting temporal file %s", small_dataset)
+            os.remove(small_dataset)
         if out_shape is None:
             out_shape = prj.model.output_shape
-
         elif out_shape != prj.model.output_shape:
             log.error("model %s output shape is %s, expected %s", path, prj.model.output_shape, out_shape)
             quit()
+        projects[path] = prj
+
+    for prj,path in zip(prjs, projects):
+        prj = Project(path)
+        err = prj.load()
+
+        if err is not None:
+            log.error("error while loading project %s: %s", path, err)
+            quit()
 
         if ref is None:
+            prj.prepare(args.dataset,0,0, False)
             ref = prj
+            is_prepared = True
+        else:
+            if are_equal:
+                log.info("Projects use same prepare.py file ...")
+                prj.dataset.X, prj.dataset.Y = ref.dataset.X.copy(), ref.dataset.Y.copy()
+            else:
+                log.info("Projects use different prepare.py files, reloading dataset ...")
+                prj.prepare(args.dataset, 0., 0., False)
 
-        projects[path] = prj
-        metrics[path] = None
-
-    ref.prepare(args.dataset, 0.0, 0.0)
-
-    log.info("evaluating %d models on %d samples ...", len(projects), len(ref.dataset.X))
-
-    for path, prj in projects.items():
         # TODO: Run in parallel?
         log.debug("running %s ...", path)
-        metrics[path] = prj.accuracy_for(ref.dataset.X, ref.dataset.Y, repo_as_dict = True)
+        metrics[path] = prj.accuracy_for(prj.dataset.X, prj.dataset.Y, repo_as_dict = True)
+
 
     prev = None
     for path, m in metrics.items():
@@ -110,9 +166,9 @@ def action_compare(argc, argv):
                         "%.2f" % ref_value,
                         "%.2f" % new_value,
                         fn("%s%.2f" % (sign, delta))] )
-        print("") 
+        print("")
         print(AsciiTable(table).table)
-        
+
         heads = [""]
         for i in range(0, ref_cm.shape[0]):
             heads.append("class %d" % i)
@@ -132,7 +188,7 @@ def action_compare(argc, argv):
 
                 if ref_v != new_v:
                     sign  = '+' if delta >= 0 else ''
-                    
+
                     if i == j:
                         fn = green if delta >= 0 else red
                     else:
@@ -149,15 +205,15 @@ def action_compare(argc, argv):
 
                 row.append(cell)
                 row_diffs.append(delta)
-            
+
             diffs['cm'].append(row_diffs)
             table.append(row)
- 
+
         print("")
         print(AsciiTable(table).table)
 
         diffs['cm_stats'] = {
-            'improvements': { 
+            'improvements': {
                 'total': impr,
                 'perc': impr / float(total) * 100.0
             },
@@ -166,7 +222,7 @@ def action_compare(argc, argv):
                 'perc': regr / float(total) * 100.0
             }
         }
-            
+
         print("")
         print("Improvements: %d ( %.2f %% )" % (impr, impr / float(total) * 100.0))
         print("Regressions : %d ( %.2f %% )" % (regr, regr / float(total) * 100.0))

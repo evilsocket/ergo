@@ -87,7 +87,7 @@ class Dataset(object):
 
         self.loader.load()
         self._set_xys()
-    
+
     def _is_scalar_value(self, v):
         try:
             return not (len(v) >= 0)
@@ -97,9 +97,12 @@ class Dataset(object):
         except:
             raise
 
-    def source(self, data, p_test = 0.0, p_val = 0.0):
-        # reset indexes and resample data just in case
-        dataset = data.sample(frac = 1).reset_index(drop = True)
+    def source(self, data, p_test = 0.0, p_val = 0.0, shuffle = True):
+        if shuffle:
+            # reset indexes and resample data just in case
+            dataset = data.sample(frac = 1).reset_index(drop = True)
+        else:
+            dataset = data
 
         # check if the input vectors are made of scalars or other vectors
         self.is_flat = True
