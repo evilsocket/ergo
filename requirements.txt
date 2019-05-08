@@ -6,4 +6,4 @@ pydot
 matplotlib
 flask
 terminaltables
-sumpy
+sum-py
