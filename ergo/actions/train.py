@@ -34,6 +34,7 @@ def parse_args(argv):
     parser.add_argument("-t", "--test", dest = "test", action = "store", type = probability, default = 0.15, required = False)
     parser.add_argument("-v", "--validation", dest = "validation", action = "store", type = probability, default = 0.15, required = False)
     parser.add_argument("--no-save", dest="no_save", action="store_true", default = False, help = "Do not save temporary datasets on disk.")
+    parser.add_argument("--no-shuffle", dest="no_shuffle", action="store_true", default = False, help="Do not shuffle dataset during preparation.")
     args = parser.parse_args(argv)
     validate_args(args)
     return args
@@ -53,7 +54,7 @@ def action_train(argc, argv):
         # a dataset was specified, split it and generate
         # the subsets
         prj.dataset.do_save = not args.no_save
-        prj.prepare(args.dataset, args.test, args.validation)
+        prj.prepare(args.dataset, args.test, args.validation, not args.no_shuffle)
     elif prj.dataset.exists():
         # no dataset passed, attempt to use the previously
         # generated subsets
