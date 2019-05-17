@@ -237,32 +237,9 @@ class Project(object):
         # save model accuracy statistics
         self._save_stats()
 
-    """
-    unused, zeroing the dataset is better and model agnostic
-
-    def null_feature(self, idx):
-        input_layer = self.model.layers[0]
-        # get_weights returns a copy!
-        input_weights = input_layer.get_weights()
-        backup_w = input_weights[0][idx,:].copy()
-        backup_b = input_weights[1][idx].copy()
-        # set to 0 the weights and bias of this input column
-        input_weights[0][idx,:] = 0
-        input_weights[1][idx] = 0
-        input_layer.set_weights(input_weights)
-        return backup_w, backup_b
-
-    def restore_feature(self, idx, backup_w, backup_b):
-        input_layer = self.model.layers[0]
-        input_weights = input_layer.get_weights()
-        input_weights[0][idx,:] = backup_w
-        input_weights[1][idx] = backup_b
-        input_layer.set_weights(input_weights)
-    """
-
-    def view(self):
-        import matplotlib.pyplot as plt
+    def _view_model(self):
         import matplotlib.image as mpimg
+        import matplotlib.pyplot as plt
 
         if self.model is not None:
             self.model.summary()
@@ -275,14 +252,22 @@ class Project(object):
             plt.figure("model structure")
             plt.imshow(img)
 
+    def _view_stats(self):
+        import matplotlib.pyplot as plt
+
+        if os.path.exists(self.txt_stats_path):
+            with open(self.txt_stats_path, 'rt') as fp:
+                print(fp.read().strip())
+
         if os.path.exists(self.json_stats_path):
             with open(self.json_stats_path, 'rt') as fp:
                 stats = json.load(fp)
                 for who, header in self.what.items():
                     orig = np.array(stats[who]['cm'])
                     cm = np.array(stats[who]['cm'])
+                    tot = cm.sum()
                     cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-                    title = "%s confusion matrix" % header.strip(" -\n").lower()
+                    title = "%s confusion matrix (%d samples)" % (header.strip(" -\n").lower(), tot)
                     plt.figure(title)
                     plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Reds)
                     plt.title(title)
@@ -298,8 +283,11 @@ class Project(object):
                                  color="white" if cm[i, j] > thresh else "black")
 
                     plt.tight_layout()
-                    plt.ylabel('True label')
-                    plt.xlabel('Predicted label')
+                    plt.ylabel('truth')
+                    plt.xlabel('prediction')
+
+    def _view_history(self):
+        import matplotlib.pyplot as plt
 
         if self.history is not None:
             plt.figure("training history")
@@ -320,9 +308,15 @@ class Project(object):
             plt.ylabel('Loss')
             plt.xlabel('Epoch')
             plt.legend(['Train', 'Test'], loc='upper right')
-
             plt.tight_layout()
 
+    def view(self):
+        import matplotlib.pyplot as plt
+
+        self._view_model()
+        self._view_stats()
+        self._view_history()
+    
         plt.show()
 
 
