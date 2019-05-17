@@ -224,8 +224,17 @@ class Project(object):
             log.info("training with %d GPUs", gpus)
             to_train = multi_gpu_model(self.model, gpus=gpus)
 
-        self.history  = self.logic.trainer(to_train, self.dataset).history
-        self.accu     = self.accuracy()
+        past = self.history.copy() if self.history is not None else None
+        present = self.logic.trainer(to_train, self.dataset).history
+
+        if past is None:
+            self.history = present
+        else:
+            self.history = {}
+            for name, past_values in past.items():
+                self.history[name] = past_values + present[name]
+
+        self.accu = self.accuracy()
 
         print("")
         self._emit_txt_stats(sys.stdout)
