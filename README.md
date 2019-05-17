@@ -66,7 +66,7 @@ Or alternatively you can use a [sum database](https://github.com/evilsocket/sum)
 
     ergo train example --dataset sum:///etc/sumd/creds/cert.pem@localhost:50051
 
-This will split the dataset into a train, validation and test sets (partitioned with the `--test` and `--validation` arguments) and start the training.
+This will split the dataset into a train, validation and test sets (partitioned with the `--test` and `--validation` arguments), start the training and once finished show the model statistics.
 
 If you want to update a model and/or train it on already imported data, you can simply:
 
