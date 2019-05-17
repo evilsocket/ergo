@@ -1,7 +1,9 @@
 import os
 import argparse
+import traceback
 import logging as log
 import pandas as pd
+import numpy as np
 from flask import Flask, request, jsonify
 
 from ergo.project import Project
@@ -13,16 +15,17 @@ app = Flask(__name__)
 def route():
     global prj
 
-    x = request.args.get('x')
-    if x is None:
+    xin = request.args.get('x')
+    if xin is None:
         return "Missing 'x' parameter.", 400
 
     try:
-        x = prj.logic.prepare_input(x)
-        y = prj.model.predict(x)
+        x = prj.logic.prepare_input(xin)
+        y = prj.model.predict(np.array([x]))
         return jsonify(y.tolist())
     except Exception as e:
         #log.exception("error while predicting on %s", x)
+        traceback.print_exc()
         log.error("%s", e)
         return str(e), 400
 
