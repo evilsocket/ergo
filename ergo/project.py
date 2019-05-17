@@ -15,7 +15,7 @@ from keras.utils.training_utils import multi_gpu_model
 import sumpy
 
 from ergo.core.logic import Logic
-from ergo.core.utils import clean_if_exist
+from ergo.core.utils import clean_if_exist, serialize_classification_report, serialize_confusion_matrix
 
 from ergo.dataset import Dataset
 from ergo.templates import Templates
@@ -42,7 +42,9 @@ class Project(object):
                 'model.png',
                 'model.h5',
                 'model.fdeep',
-                'model.stats',
+                'model.stats', # legacy
+                'stats.txt',
+                'stats.json',
                 'history.json'))
 
     def __init__(self, path):
@@ -57,11 +59,12 @@ class Project(object):
         self.weights_path   = os.path.join(self.path, 'model.h5')
         self.fdeep_path     = os.path.join(self.path, 'model.fdeep')
         # training related data
-        self.dataset        = Dataset(self.path)
-        self.stats_path     = os.path.join(self.path, 'model.stats')
-        self.history_path   = os.path.join(self.path, 'history.json')
-        self.history        = None
-        self.what           = {
+        self.dataset         = Dataset(self.path)
+        self.txt_stats_path  = os.path.join(self.path, 'stats.txt')
+        self.json_stats_path = os.path.join(self.path, 'stats.json')
+        self.history_path    = os.path.join(self.path, 'history.json')
+        self.history         = None
+        self.what            = {
             'train' : "Training --------------------------------------------\n",
             'val'   : "Validation ------------------------------------------\n",
             'test'  : "Test ------------------------------------------------\n"
@@ -131,7 +134,7 @@ class Project(object):
         with open(self.history_path, 'w') as fp:
             json.dump(self.history, fp)
 
-    def _out_stats(self, where):
+    def _emit_txt_stats(self, where):
         for who, header in self.what.items():
             vals = self.accu[who]
             where.write( header )
@@ -142,10 +145,24 @@ class Project(object):
             where.write("%s\n" % vals[1])
             where.write("\n")
 
+    def _emit_json_stats(self, where):
+        stats = {}
+        for who in self.what:
+            report, cm = self.accu[who]
+            stats[who] = { 
+                'accuracy': serialize_classification_report(report), 
+                'cm': serialize_confusion_matrix(cm)
+            }
+        json.dump(stats, where)
+
     def _save_stats(self):
-        log.info("updating %s ...", self.stats_path)
-        with open(self.stats_path, 'w') as fp:
-            self._out_stats(fp)
+        log.info("updating %s ...", self.txt_stats_path)
+        with open(self.txt_stats_path, 'w') as fp:
+            self._emit_txt_stats(fp)
+
+        log.info("updating %s ...", self.json_stats_path)
+        with open(self.json_stats_path, 'wt') as fp:
+            self._emit_json_stats(fp)
 
     def _from_file(self, filename):
         log.info("preparing data from %s ...", filename)
@@ -210,7 +227,7 @@ class Project(object):
         self.accu     = self.accuracy()
 
         print("")
-        self._out_stats(sys.stdout)
+        self._emit_txt_stats(sys.stdout)
 
         # save model structure and weights
         self._save_model()
