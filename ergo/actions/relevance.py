@@ -1,4 +1,5 @@
 import argparse
+import json
 import logging as log
 import time
 import numpy as np
@@ -6,6 +7,11 @@ import numpy as np
 from terminaltables import AsciiTable
 
 from ergo.project import Project
+
+# https://stackoverflow.com/questions/11942364/typeerror-integer-is-not-json-serializable-when-serializing-json-in-python
+def default(o):
+    if isinstance(o, np.int64): return int(o)
+    raise TypeError
 
 def validate_args(args):
     if args.ratio > 1.0 or args.ratio <= 0:
@@ -23,6 +29,8 @@ def parse_args(argv):
         help="Optional file containing the attribute names, one per line.")
     parser.add_argument("-r", "--ratio", dest="ratio", action="store", type=float, required=False, default=1.0,
         help="Size of the subset of the dataset to use in the (0,1] interval.")
+    parser.add_argument("-j", "--to-json", dest="to_json", action="store", type=str, required=False,
+        help="Output the relevances to this json file.")
 
     args = parser.parse_args(argv)
     return args
@@ -100,21 +108,39 @@ def action_relevance(argc, argv):
 
     deltas = sorted(deltas, key = lambda x: abs(x[1]), reverse = True)
 
-    num_irrelevant = 0
-    table = [("Column", "Feature", "Relevance")]
+    rels     = []
+    num_zero = 0
+    table    = [("Column", "Feature", "Relevance")]
+
     for delta in deltas:
         col, d = delta
+        colname = attributes[col]
+        rel = {
+            "attribute": colname,
+            "index": col, 
+            "relevance": 0.0     
+        }
+
         if d != 0.0:
             relevance = (d / tot) * 100.0
             row       = ("%d" % col, attributes[col], "%.2f%%" % relevance)
             row       = ["\033[31m%s\033[0m" % e for e in row] if relevance < 0.0 else row
             table.append(row)
+            rel['relevance'] = relevance
         else:
-            num_irrelevant += 1
+            num_zero += 1
+
+        rels.append(rel)
 
     print("")
     print(AsciiTable(table).table)
     print("")
 
-    if num_irrelevant > 0:
-        log.info("%d features have 0 relevance.", num_irrelevant)
+    if num_zero > 0:
+        log.info("%d features have 0 relevance.", num_zero)
+
+    if args.to_json is not None:
+        print("")
+        log.info("creating %s ...", args.to_json)
+        with open(args.to_json, 'w+') as fp:
+            json.dump(rels, fp, default=default)

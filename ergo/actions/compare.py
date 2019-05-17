@@ -18,7 +18,7 @@ def parse_args(argv):
     parser.add_argument("-d", "--dataset", dest="dataset", action="store", type=str, required=True,
         help="The dataset file to use to compare the models.")
     parser.add_argument("-j", "--to-json", dest="to_json", action="store", type=str, required=False,
-        help="Output the comparision results to json.")
+        help="Output the comparision results to this json file.")
 
     args = parser.parse_args(argv)
     return args
