@@ -77,8 +77,22 @@ def train_model(model, dataset):
             callbacks = [earlyStop])
 """
 
+deps = \
+"""
+ergo
+"""
+
+gitignore = \
+"""
+*.pyc
+*.csv
+__pycache__
+"""
+
 Templates = { 
     'prepare.py' : prepare,
     'model.py'   : model,
-    'train.py'   : train
+    'train.py'   : train,
+    'requirements.txt': deps,
+    '.gitignore' : gitignore
 }
