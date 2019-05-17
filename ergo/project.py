@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import re
+import itertools
 import logging as log
 
 import numpy as np
@@ -15,7 +16,7 @@ from keras.utils.training_utils import multi_gpu_model
 import sumpy
 
 from ergo.core.logic import Logic
-from ergo.core.utils import clean_if_exist, serialize_classification_report, serialize_confusion_matrix
+from ergo.core.utils import clean_if_exist, serialize_classification_report, serialize_cm
 
 from ergo.dataset import Dataset
 from ergo.templates import Templates
@@ -151,7 +152,7 @@ class Project(object):
             report, cm = self.accu[who]
             stats[who] = { 
                 'accuracy': serialize_classification_report(report), 
-                'cm': serialize_confusion_matrix(cm)
+                'cm': serialize_cm(cm)
             }
         json.dump(stats, where)
 
@@ -271,11 +272,37 @@ class Project(object):
                     show_shapes = True,
                     show_layer_names = True)
             img = mpimg.imread(self.model_img_path)
-            plt.figure()
+            plt.figure("model structure")
             plt.imshow(img)
 
+        if os.path.exists(self.json_stats_path):
+            with open(self.json_stats_path, 'rt') as fp:
+                stats = json.load(fp)
+                for who, header in self.what.items():
+                    orig = np.array(stats[who]['cm'])
+                    cm = np.array(stats[who]['cm'])
+                    cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+                    title = "%s confusion matrix" % header.strip(" -\n").lower()
+                    plt.figure(title)
+                    plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Reds)
+                    plt.title(title)
+                    plt.colorbar()
+                    classes = range(0, cm.shape[0])
+                    tick_marks = np.arange(len(classes))
+                    plt.xticks(tick_marks, classes, rotation=45)
+                    plt.yticks(tick_marks, classes)
+                    thresh = cm.max() / 2.
+                    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+                        plt.text(j, i, "%.1f%% (%d)" % (cm[i, j] * 100, orig[i, j]),
+                                 horizontalalignment="center",
+                                 color="white" if cm[i, j] > thresh else "black")
+
+                    plt.tight_layout()
+                    plt.ylabel('True label')
+                    plt.xlabel('Predicted label')
+
         if self.history is not None:
-            plt.figure()
+            plt.figure("training history")
             # Plot training & validation accuracy values
             plt.subplot(2,1,1)
             plt.plot(self.history['acc'])

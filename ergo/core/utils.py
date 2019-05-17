@@ -1,6 +1,7 @@
 import os
 import shutil
 import logging as log
+import numpy as np
 
 from collections import defaultdict
 
@@ -31,5 +32,5 @@ def serialize_classification_report(cr):
             out[class_label][m.strip()] = float(row[j + 1].strip())
     return out
 
-def serialize_confusion_matrix(cm):
+def serialize_cm(cm):
     return cm.tolist()
