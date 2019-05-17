@@ -38,7 +38,7 @@ def get_pad(l):
     return pad
 
 def action_help(argc=0, argv=None):
-    print("usage: ergo <action> [args]")
+    print("usage: ergo <action> [args] / ergo <action> -h (to get action specific help)")
 
     global ACTIONS 
     pad = get_pad(ACTIONS)
@@ -51,16 +51,16 @@ def action_help(argc=0, argv=None):
 ACTIONS = collections.OrderedDict([
     ("help", Action("help", "Print the usage menu.", action_help)),
     ("info", Action("info", "Print library versions and hardware info.", action_info)),
-    ("create", Action("create", "Create a new project.", action_create)),
-    ("optimize-dataset", Action("optimize-dataset", "Perform dataset optimization (removes duplicates and keep a given amount from the main dataset).", action_optimize_dataset)),
-    ("train", Action("train", "Train a model (use --dataset /path/file.csv to import a dataset the first time).", action_train)),
-    ("clean", Action("clean", "Clean a project from temporary datasets (use --all to reset a project state).", action_clean)),
-    ("view", Action("view", "View a model structure and accuracy metrics over training.", action_view)),
-    ("cmp", Action("cmp", "Evaluate performances of two models against a given dataset.", action_compare)),
-    ("relevance", Action("relevance", "Run evaluation several times by nulling feature by feature and returning the relevance of each one.", action_relevance)),
-    ("serve", Action("serve", "Serve a pretrained model via a REST API.", action_serve)),
-    ("to-fdeep", Action("to-fdeep", "Convert a Keras model to fdeep format.", action_to_fdeep)),
-    ("to-tf", Action("to-tf", "Convert a Keras model to TensorFlow protobuf format by freezing its graph.", action_to_tf)),
+    ("create", Action("create", "Create a new ergo project.", action_create)),
+    ("optimize-dataset", Action("optimize-dataset", "Remove duplicates from the dataset and only allow them within a given reuse ratio.", action_optimize_dataset)),
+    ("train", Action("train", "Start the training phase of a model.", action_train)),
+    ("clean", Action("clean", "Clean a project from temporary datasets and optionally reset it to its initial state.", action_clean)),
+    ("view", Action("view", "View the model struture and training statistics.", action_view)),
+    ("cmp", Action("cmp", "Compare the performances of two models against a given dataset.", action_compare)),
+    ("relevance", Action("relevance", "Compute the relevance of each feature of the dataset by differential evaluation.", action_relevance)),
+    ("serve", Action("serve", "Load a model and expose an API that can be used to run its inference.", action_serve)),
+    ("to-fdeep", Action("to-fdeep", "Convert the model inside an ergo project to the frugally-deep library format.", action_to_fdeep)),
+    ("to-tf", Action("to-tf", "Convert the model inside an ergo project to TensorFlow format.", action_to_tf)),
 ])
 
 def main():

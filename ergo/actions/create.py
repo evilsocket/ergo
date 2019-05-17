@@ -1,27 +1,23 @@
 import sys
 import os
+import argparse
 import logging as log
 
 from ergo.project import Project
 
-def usage():
-    log.info("usage: ergo create <path>")
-    quit()
+def parse_args(argv):
+    parser = argparse.ArgumentParser(prog="ergo create", description="Create a new ergo project.")
+    parser.add_argument("path", help="Path of the project to create.")
+    args = parser.parse_args(argv)
+    return args
 
 def action_create(argc, argv):
-    if argc != 1:
-        usage()
-    
-    path = argv[0]
-
-    if os.path.exists(path):
-        log.error("path %s already exists" % path)
+    args = parse_args(argv)
+    if os.path.exists(args.path):
+        log.error("path %s already exists" % args.path)
         quit()
-    
-    log.info("creating %s ..." % path) 
-    os.makedirs(path, exist_ok=True)
 
-    Project.create(path)
+    Project.create(args.path)
 
 
 

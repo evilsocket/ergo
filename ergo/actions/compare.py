@@ -9,14 +9,17 @@ from terminaltables import AsciiTable
 
 from ergo.project import Project
 
-def usage():
-    print("usage: ergo cmp <path_1> <path_2> --dataset <path> (--to-json <file>)")
-    quit()
-
 def parse_args(argv):
-    parser = argparse.ArgumentParser(description="comparer")
-    parser.add_argument("-d", "--dataset", dest = "dataset", action = "store", type = str, required = True)
-    parser.add_argument("-j", "--to-json", dest = "to_json", action = "store", type = str, required = False)
+    parser = argparse.ArgumentParser(prog="ergo cmp", description="Compare the performances of two models against a given dataset.")
+
+    parser.add_argument("path_1", help="Path of the first project to compare.")
+    parser.add_argument("path_2", help="Path of the second project to compare.")
+
+    parser.add_argument("-d", "--dataset", dest="dataset", action="store", type=str, required=True,
+        help="The dataset file to use to compare the models.")
+    parser.add_argument("-j", "--to-json", dest="to_json", action="store", type=str, required=False,
+        help="Output the comparision results to json.")
+
     args = parser.parse_args(argv)
     return args
 
@@ -30,7 +33,6 @@ def green(s):
 def default(o):
     if isinstance(o, np.int64): return int(o)
     raise TypeError
-
 
 def generate_reduced_dataset(dataset, size = 10):
     temp_name = next(tempfile._get_candidate_names())
@@ -75,14 +77,11 @@ def compare_datasets(ds1, ds2):
 
 
 def action_compare(argc, argv):
-    if argc < 4:
-        usage()
-
-    args     = parse_args(argv[2:])
+    args     = parse_args(argv)
     metrics  = {}
     projects = { \
-        argv[0]: None,
-        argv[1]: None,
+        args.path_1: None,
+        args.path_2: None,
     }
     ref       = None
     inp_shape = None
@@ -120,7 +119,7 @@ def action_compare(argc, argv):
             quit()
 
         if ref is None:
-            prj.prepare(args.dataset,0,0, False)
+            prj.prepare(args.dataset, 0, 0, False)
             ref = prj
             is_prepared = True
         else:
@@ -134,7 +133,6 @@ def action_compare(argc, argv):
         # TODO: Run in parallel?
         log.debug("running %s ...", path)
         metrics[path] = prj.accuracy_for(prj.dataset.X, prj.dataset.Y, repo_as_dict = True)
-
 
     prev = None
     for path, m in metrics.items():

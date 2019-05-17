@@ -6,6 +6,7 @@ import datetime
 import hashlib
 import json
 import sys
+import argparse
 
 import keras
 import numpy as np
@@ -23,7 +24,6 @@ __maintainer__ = "Tobias Hermann, https://github.com/Dobiasd/frugally-deep"
 __email__ = "editgym@gmail.com"
 
 STORE_FLOATS_HUMAN_READABLE = False
-
 
 def transform_input_kernel(kernel):
     """Transforms weights of a single CuDNN input kernel into the regular Keras format."""
@@ -791,21 +791,21 @@ def convert(in_path, out_path, no_tests=False):
     write_text_file(out_path, json.dumps(
         json_output, allow_nan=False, indent=2, sort_keys=True))
 
-def usage():
-    print("usage: ergo to-fdeep <path>")
-    quit()
+def parse_args(argv):
+    parser = argparse.ArgumentParser(prog="ergo to-fdeep", description="Convert the model inside an ergo project to the frugally-deep library format.")
+    parser.add_argument("path", help="Path of the project containing the model.")
+    args = parser.parse_args(argv)
+    return args
 
 def action_to_fdeep(argc, argv):
-    if argc < 1:
-        usage()
-
-    prj = Project(argv[0])
+    args = parse_args(argv)
+    prj = Project(args.path)
     err = prj.load()
     if err is not None:
         log.error("error while loading project: %s", err)
         quit()
     elif not prj.is_trained():
-        log.error("no trained Keras model found for this projec")
+        log.error("no trained model found for this project")
         quit()
 
     convert(prj.weights_path, prj.fdeep_path)

@@ -1,6 +1,7 @@
 """Convert a Keras model to tensorflow protobuf format.
 """
 import os
+import argparse
 
 import tensorflow as tf
 from keras import backend as K
@@ -40,15 +41,15 @@ def freeze_session(session, keep_var_names=None, output_names=None, clear_device
             session, input_graph_def, output_names, freeze_var_names)
         return frozen_graph
 
-def usage():
-    print("usage: ergo to-tf <path>")
-    quit()
+def parse_args(argv):
+    parser = argparse.ArgumentParser(prog="ergo to-tf", description="Convert the model inside an ergo project to TensorFlow format.")
+    parser.add_argument("path", help="Path of the project containing the model.")
+    args = parser.parse_args(argv)
+    return args
 
 def action_to_tf(argc, argv):
-    if argc < 1:
-        usage()
-
-    prj = Project(argv[0])
+    args = parse_args(argv)
+    prj = Project(args.path)
     err = prj.load()
     if err is not None:
         log.error("error while loading project: %s", err)

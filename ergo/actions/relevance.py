@@ -7,22 +7,24 @@ from terminaltables import AsciiTable
 
 from ergo.project import Project
 
-def usage():
-    print("usage: ergo relevance <path> --dataset <path> --attributes <path>")
-    quit()
-
 def validate_args(args):
     if args.ratio > 1.0 or args.ratio <= 0:
         log.error("ratio must be in the (0.0, 1.0] interval")
         quit()
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(description="relevance")
-    parser.add_argument("-d", "--dataset", dest = "dataset", action = "store", type = str, required = True)
-    parser.add_argument("-a", "--attributes", dest = "attributes", action = "store", type = str, required = False)
-    parser.add_argument("-r", "--ratio", dest = "ratio", action = "store", type = float, required = False, default = 1.0)
+    parser = argparse.ArgumentParser(prog="ergo relevance", description="Compute the relevance of each feature of the dataset by differential evaluation.")
+
+    parser.add_argument("path", help="Path of the project.")
+
+    parser.add_argument("-d", "--dataset", dest="dataset", action="store", type=str, required=True,
+        help="Dataset file to use.")
+    parser.add_argument("-a", "--attributes", dest="attributes", action="store", type=str, required=False,
+        help="Optional file containing the attribute names, one per line.")
+    parser.add_argument("-r", "--ratio", dest="ratio", action="store", type=float, required=False, default=1.0,
+        help="Size of the subset of the dataset to use in the (0,1] interval.")
+
     args = parser.parse_args(argv)
-    validate_args(args)
     return args
 
 def get_attributes(filename, ncols):
@@ -53,11 +55,8 @@ def restore_feature(X, col, backup, is_scalar_input):
         X[col] = backup
 
 def action_relevance(argc, argv):
-    if argc < 3:
-        usage()
-
-    args = parse_args(argv[1:])
-    prj = Project(argv[0])
+    args = parse_args(argv)
+    prj = Project(args.path)
     err = prj.load()
     if err is not None:
         log.error("error while loading project: %s", err)

@@ -24,6 +24,7 @@ class Project(object):
     @staticmethod
     def create(path):
         log.info("initializing project %s ...", path)
+        os.makedirs(path, exist_ok=True)
         for filename, data in Templates.items():
             log.info( "creating %s", filename)
             with open( os.path.join(path, filename), 'wt' ) as fp:

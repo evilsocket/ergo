@@ -1,7 +1,6 @@
 import os
 import argparse
 import logging as log
-
 import pandas as pd
 from flask import Flask, request, jsonify
 
@@ -28,25 +27,25 @@ def route():
         return str(e), 400
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(description="server")
-    parser.add_argument("--host", dest = "host", action = "store", type = str)
-    parser.add_argument("--port", dest = "port", action = "store", type = int, default = 8080)
-    parser.add_argument("--debug", dest = "debug", action = "store_true", default = False)
+    parser = argparse.ArgumentParser(prog="ergo serve", description="Load a model and expose an API that can be used to run its inference.")
+
+    parser.add_argument("path", help="Path of the project.")
+
+    parser.add_argument("--host", dest="host", action="store", type=str,
+        help="Address or hostname to bind to.")
+    parser.add_argument("--port", dest="port", action="store", type=int, default=8080,
+        help="TCP port to bind to.")
+    parser.add_argument("--debug", dest="debug", action="store_true", default=False,
+        help="Enable debug messages.")
+
     args = parser.parse_args(argv)
     return args
-
-def usage():
-    print("usage: ergo serve <path>")
-    quit()
 
 def action_serve(argc, argv):
     global prj, app
 
-    if argc < 1:
-        usage()
-
-    args = parse_args(argv[1:])
-    prj = Project(argv[0])
+    args = parse_args(argv)
+    prj = Project(args.path)
     err = prj.load()
     if err is not None:
         log.error("error while loading project: %s", err)
