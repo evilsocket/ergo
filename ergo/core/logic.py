@@ -56,8 +56,8 @@ class Logic(object):
     def prepare_dataset(self, filename):
         return self.dataset_preparer(filename)
 
-    def prepare_input(self, x):
-        return self.input_preparer(x)
+    def prepare_input(self, x, is_encoding = False):
+        return self.input_preparer(x, is_encoding)
 
 
 

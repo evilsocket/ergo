@@ -20,6 +20,7 @@ from ergo.core.action import Action
 
 from ergo.actions.info import action_info
 from ergo.actions.create import action_create
+from ergo.actions.encode import action_encode
 from ergo.actions.optimize import action_optimize_dataset
 from ergo.actions.train import action_train
 from ergo.actions.clean import action_clean
@@ -52,6 +53,7 @@ ACTIONS = collections.OrderedDict([
     ("help", Action("help", "Print the usage menu.", action_help)),
     ("info", Action("info", "Print library versions and hardware info.", action_info)),
     ("create", Action("create", "Create a new ergo project.", action_create)),
+    ("encode", Action("encode", "Encode one or more files to vectors and create or update a csv dataset for training.", action_encode)),
     ("optimize-dataset", Action("optimize-dataset", "Remove duplicates from the dataset and only allow them within a given reuse ratio.", action_optimize_dataset)),
     ("train", Action("train", "Start the training phase of a model.", action_train)),
     ("clean", Action("clean", "Clean a project from temporary datasets and optionally reset it to its initial state.", action_clean)),

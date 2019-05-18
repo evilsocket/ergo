@@ -9,10 +9,13 @@ def prepare_dataset(filename):
     # simply read as csv
     return pd.read_csv(filename, sep = ',', header = None)
 
-# called during `ergo serve <project>` for each `x` input parameter, use this 
-# function to convert, for instance, a file name in a vector of scalars for 
-# your model input layer.
-def prepare_input(x):
+# this function is called to process a single input into a vector
+# that can be used for training or to run an inference.
+# it is called from `ergo encode ...` with `is_encoding` set to True,
+# in which case you can add additional metadata to the vector, or
+# from the `ergo serve ...` API, in which case the vector will be
+# used for inference and can't contain metadata.
+def prepare_input(x, is_encoding = False):
     # simply read as csv
     return pd.read_csv( pd.compat.StringIO(x), sep = ',', header = None)
 """

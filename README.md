@@ -11,23 +11,16 @@
 **It can be used to**: 
 
 * scaffold new projects in seconds and customize only a minimum amount of code.
-* import and optimize CSV datasets and train the model with them.
+* encode samples, import and optimize CSV datasets and train the model with them.
 * visualize the model structure, loss and accuracy functions during training.
 * determine how each of the input features affects the accuracy by differential training.
 * export a simple REST API to use your models from a server.
 
-### Installation
+### Installing with PIP
 
     sudo pip3 install ergo-ai
 
-##### Enable GPU support
-
-Make sure you have [CUDA 9.0 and cuDNN 7.0 installed](https://medium.com/@zhanwenchen/install-cuda-and-cudnn-for-tensorflow-gpu-on-ubuntu-79306e4ac04e) and then:
-
-    sudo pip3 uninstall tensorflow
-    sudo pip3 install tensorflow-gpu
-
-#### Building from Source
+### Installing from Sources
 
 Download the [latest stable release](https://github.com/evilsocket/ergo/releases), extract and:
 
@@ -37,7 +30,24 @@ Download the [latest stable release](https://github.com/evilsocket/ergo/releases
     python3 setup.py build
     sudo python3 setup.py install
 
-### Creating a Project
+### Enable GPU support (optional)
+
+Make sure you have [CUDA 9.0 and cuDNN 7.0 installed](https://medium.com/@zhanwenchen/install-cuda-and-cudnn-for-tensorflow-gpu-on-ubuntu-79306e4ac04e) and then:
+
+    sudo pip3 uninstall tensorflow
+    sudo pip3 install tensorflow-gpu
+
+### Usage
+
+To print the general help menu:
+
+    ergo help
+
+To print action specific help:
+
+    ergo <action> -h
+
+#### Creating a Project
 
 Start by printing the available actions by running `ergo help`, you can also print the software version (ergo, keras 
 and tensorflow versions) and some hardware info with `ergo info` to verify your installation. 
@@ -56,7 +66,23 @@ By default, ergo will simply read the dataset as a CSV file, build a small neura
 each and 2 outputs and use a pretty standard training algorithm. **You can see a complete (and more complex) example on the [planes-detector](https://github.com/evilsocket/ergo-planes-detector) 
 project repository**.
 
-### Training
+#### Encoding (optional)
+
+In case you implemented the `prepare_input` function in the `prepare.py` script, ergo can be used to encode raw samples, being them executables, images, strings or whatever, into vectors of scalars that are then saved into a `dataset.csv` file suitable for training
+
+Example with a folder `/path/to/data` which contains a `pos` and `neg` subfolders, in auto labeling mode each group of sample is labeled with its parent directory name:
+
+    ergo encode example /path/to/data
+
+Example with a single folder and manual labeling:
+
+    ergo encode example /path/to/data --label 'some-label'
+
+Example with a single text file containing multiple inputs, one per line:
+
+    ergo encode example /path/to/data --label 'some-label' -m
+
+#### Training
 
 After defining the model structure and the training process, you can import a CSV dataset (first column must be the label) and start training using 2 GPUs:
 
@@ -72,7 +98,7 @@ If you want to update a model and/or train it on already imported data, you can 
 
     ergo train example --gpus 2
 
-### Testing and Inference
+#### Testing
 
 Now it's time to visualize the model structure and how the the `accuracy` and `loss` metrics changed during training (requires `sudo apt-get install graphviz python3-tk`):
     
@@ -86,17 +112,25 @@ Once you're done, you can remove the train, test and validation temporary datase
 
     ergo clean example
 
+#### Inference
+
 To load the model and start a REST API for evaluation (can be customized with `--host`, `--port` and `--debug` options): 
 
     ergo serve example
 
-You'll be able to access the model for evaluation via `http://127.0.0.1:8080/?x=0.345,1.0,0.9,...`.
+To run an inference on a vector of scalars:
+
+    curl "http://localhost:8080/?x=0.345,1.0,0.9,..."
+
+If you customized the `prepare_input` function in `prepare.py` (see the `Encoding` section), you can run an inference on a raw sample:
+
+    curl "http://localhost:8080/?x=/path/to/sample"
+
+#### Other commands
 
 To reset the state of a project (**WARNING**: this will remove the datasets, the model files and all training statistics):
 
     ergo clean example --all
-
-### Other commands
 
 Evaluate and compare the performances of two trained models on a given dataset and (optionally) output the differences to a json file:
 

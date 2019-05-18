@@ -40,7 +40,6 @@ class Project(object):
                 '__pycache__',
                 'logs',
                 'model.yml',
-                'model.png',
                 'model.h5',
                 'model.fdeep',
                 'model.stats', # legacy
@@ -56,7 +55,6 @@ class Project(object):
         self.model          = None
         self.accu           = None
         self.model_path     = os.path.join(self.path, 'model.yml')
-        self.model_img_path = os.path.join(self.path, 'model.png')
         self.weights_path   = os.path.join(self.path, 'model.h5')
         self.fdeep_path     = os.path.join(self.path, 'model.fdeep')
         # training related data
@@ -247,19 +245,8 @@ class Project(object):
         self._save_stats()
 
     def _view_model(self):
-        import matplotlib.image as mpimg
-        import matplotlib.pyplot as plt
-
         if self.model is not None:
             self.model.summary()
-            log.info("saving model to %s ...", self.model_img_path)
-            plot_model( self.model,
-                    to_file = self.model_img_path,
-                    show_shapes = True,
-                    show_layer_names = True)
-            img = mpimg.imread(self.model_img_path)
-            plt.figure("model structure")
-            plt.imshow(img)
 
     def _view_stats(self):
         import matplotlib.pyplot as plt
