@@ -13,12 +13,30 @@ classes     = None
 num_outputs = 0
 app         = Flask(__name__)
 
-@app.route('/')
+def get_input(req):
+    # search in query parameters
+    x = request.args.get('x')
+    if x is not None and x != "":
+        return x
+
+    # search in form body
+    x = request.form.get('x')
+    if x is not None and x != "":
+        return x
+
+    # search as file upload
+    x = request.files['x']
+    if x is not None:
+        return x
+
+    return None
+
+@app.route('/', methods=['POST', 'GET'])
 def route():
     global prj, classes, num_outputs
 
     try:
-        xin = request.args.get('x')
+        xin = get_input(request)
         if xin is None:
             return "missing 'x' parameter", 400
 

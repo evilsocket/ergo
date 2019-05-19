@@ -127,6 +127,14 @@ If you customized the `prepare_input` function in `prepare.py` (see the `Encodin
 
     curl "http://localhost:8080/?x=/path/to/sample"
 
+The input `x` can also be passed as a POST request:
+
+    curl --data 'x=...' "http://localhost:8080/"
+
+Or as a file upload:
+
+    curl -F 'x=@/path/to/file' "http://localhost:8080/"
+
 #### Other commands
 
 To reset the state of a project (**WARNING**: this will remove the datasets, the model files and all training statistics):
