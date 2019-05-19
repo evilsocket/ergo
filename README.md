@@ -16,13 +16,11 @@
 * determine how each of the input features affects the accuracy by differential training.
 * export a simple REST API to use your models from a server.
 
-### Installing with PIP
+### Installing
 
     sudo pip3 install ergo-ai
 
 ### Installing from Sources
-
-Download the [latest stable release](https://github.com/evilsocket/ergo/releases), extract and:
 
     git clone https://github.com/evilsocket/ergo.git
     cd ergo
