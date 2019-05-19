@@ -35,7 +35,7 @@ Make sure you have [CUDA 9.0 and cuDNN 7.0 installed](https://medium.com/@zhanwe
     sudo pip3 uninstall tensorflow
     sudo pip3 install tensorflow-gpu
 
-### Examples
+### Example Projects
 
 - A [planes detector](https://github.com/evilsocket/ergo-planes-detector) from satellite imagery.
 - An [anti malware API](https://github.com/evilsocket/ergo-pe-av) for Windows.
