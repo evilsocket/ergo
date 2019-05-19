@@ -114,7 +114,7 @@ Once you're done, you can remove the train, test and validation temporary datase
 
 #### Inference
 
-To load the model and start a REST API for evaluation (can be customized with `--host`, `--port` and `--debug` options): 
+To load the model and start a REST API for evaluation (can be customized with `--address`, `--port`, `--classes` and `--debug` options): 
 
     ergo serve example
 

@@ -8,25 +8,35 @@ from flask import Flask, request, jsonify
 
 from ergo.project import Project
 
-prj = None
-app = Flask(__name__)
+prj         = None
+classes     = None
+num_outputs = 0
+app         = Flask(__name__)
 
 @app.route('/')
 def route():
-    global prj
-
-    xin = request.args.get('x')
-    if xin is None:
-        return "Missing 'x' parameter.", 400
+    global prj, classes, num_outputs
 
     try:
+        xin = request.args.get('x')
+        if xin is None:
+            return "missing 'x' parameter", 400
+
+        # encode the input
         x = prj.logic.prepare_input(xin)
-        y = prj.model.predict(np.array([x]))
-        return jsonify(y.tolist())
+        # run inference
+        y = prj.model.predict(np.array([x]))[0].tolist()
+        # decode results
+        num_y = len(y)
+        resp = {}
+
+        if num_y != num_outputs:
+            return "expected %d output classes, got inference with %d results" % (num_outputs, num_y), 500
+
+        resp = { classes[i] : y[i] for i in range(num_y) }
+
+        return jsonify(resp), 200
     except Exception as e:
-        #log.exception("error while predicting on %s", x)
-        traceback.print_exc()
-        log.error("%s", e)
         return str(e), 400
 
 def parse_args(argv):
@@ -34,18 +44,21 @@ def parse_args(argv):
 
     parser.add_argument("path", help="Path of the project.")
 
-    parser.add_argument("--host", dest="host", action="store", type=str,
-        help="Address or hostname to bind to.")
-    parser.add_argument("--port", dest="port", action="store", type=int, default=8080,
+    parser.add_argument("-a", "--address", dest="address", action="store", type=str,
+        help="IP address or hostname to bind to.")
+    parser.add_argument("-p", "--port", dest="port", action="store", type=int, default=8080,
         help="TCP port to bind to.")
-    parser.add_argument("--debug", dest="debug", action="store_true", default=False,
+    parser.add_argument("-d", "--debug", dest="debug", action="store_true", default=False,
         help="Enable debug messages.")
+
+    parser.add_argument("--classes", dest="classes", default=None,
+        help="Optional comma separated list of output classes.")
 
     args = parser.parse_args(argv)
     return args
 
 def action_serve(argc, argv):
-    global prj, app
+    global prj, app, classes, num_outputs
 
     args = parse_args(argv)
     prj = Project(args.path)
@@ -57,4 +70,11 @@ def action_serve(argc, argv):
         log.error("no trained Keras model found for this project")
         quit()
 
-    app.run(host=args.host, port=args.port, debug=args.debug)
+    if args.classes is None:
+        num_outputs = prj.model.output.shape[1]
+        classes = ["class_%d" % i for i in range(num_outputs)]
+    else:
+        classes = [s.strip() for s in args.classes.split(',') if s.strip() != ""]
+        num_outputs = len(classes)
+
+    app.run(host=args.address, port=args.port, debug=args.debug)
