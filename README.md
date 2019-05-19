@@ -37,6 +37,11 @@ Make sure you have [CUDA 9.0 and cuDNN 7.0 installed](https://medium.com/@zhanwe
     sudo pip3 uninstall tensorflow
     sudo pip3 install tensorflow-gpu
 
+### Examples
+
+- A [planes detector](https://github.com/evilsocket/ergo-planes-detector) from satellite imagery.
+- An [anti malware API](https://github.com/evilsocket/ergo-pe-av) for Windows.
+
 ### Usage
 
 To print the general help menu:
@@ -62,9 +67,7 @@ Inside the newly created `example` folder, there will be three files:
 2. `model.py`, that you can change to customize the model.
 3. `train.py`, for the training algorithm.
 
-By default, ergo will simply read the dataset as a CSV file, build a small neural network with 10 inputs, two hidden layers of 30 neurons 
-each and 2 outputs and use a pretty standard training algorithm. **You can see a complete (and more complex) example on the [planes-detector](https://github.com/evilsocket/ergo-planes-detector) 
-project repository**.
+By default, ergo will simply read the dataset as a CSV file, build a small neural network with 10 inputs, two hidden layers of 30 neurons each and 2 outputs and use a pretty standard training algorithm.
 
 #### Encoding (optional)
 
