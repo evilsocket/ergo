@@ -4,6 +4,7 @@ import argparse
 import logging as log
 
 from ergo.project import Project
+from ergo.templates import Templates
 
 def parse_args(argv):
     parser = argparse.ArgumentParser(prog="ergo create", description="Create a new ergo project.")
@@ -29,8 +30,23 @@ def action_create(argc, argv):
         log.error("path %s already exists" % args.path)
         quit()
 
-    Project.create(args.path, args.num_inputs, args.hidden, args.num_outputs, args.batch_size, args.max_epochs)
+    check = [n for n in [int(s.strip()) for s in args.hidden.split(',') if s.strip() != ""] if n > 0]
+    if len(check) < 1:
+        log.error("the --hidden argument must be a comma separated list of at least one positive integer")
+        quit()
 
+    ctx = {
+        'NUM_INPUTS': args.num_inputs,
+        'HIDDEN':     ', '.join([str(n) for n in check]),
+        'NUM_OUTPUTS': args.num_outputs,
+        'BATCH_SIZE': args.batch_size,
+        'MAX_EPOCHS': args.max_epochs,
+    }
 
-
-
+    log.info("initializing project %s with ANN %d(%s)%d ...", args.path, ctx['NUM_INPUTS'], ctx['HIDDEN'], ctx['NUM_OUTPUTS'])
+    os.makedirs(args.path, exist_ok=True)
+    for tpl in Templates:
+        log.info( "creating %s", tpl.name)
+        with open( os.path.join(args.path, tpl.name), 'wt' ) as fp:
+            data = tpl.compile(ctx)  
+            fp.write(data)

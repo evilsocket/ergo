@@ -12,52 +12,11 @@ from sklearn.metrics import classification_report, confusion_matrix
 from keras.models import model_from_yaml, load_model
 from keras.utils.training_utils import multi_gpu_model
 
+from ergo.core.utils import serialize_classification_report, serialize_cm
 from ergo.core.logic import Logic
-from ergo.core.utils import clean_if_exist, serialize_classification_report, serialize_cm
-
 from ergo.dataset import Dataset
-from ergo.templates import Templates
 
 class Project(object):
-    @staticmethod
-    def create(path, num_inputs = 10, hidden = '30, 30', num_outputs = 2, batch_size = 64, max_epochs = 50):
-        check = [n for n in [int(s.strip()) for s in hidden.split(',') if s.strip() != ""] if n > 0]
-        if len(check) < 1:
-            log.error("the --hidden argument must be a comma separated list of at least one positive integer")
-            quit()
-
-        ctx = {
-            'NUM_INPUTS': num_inputs,
-            'HIDDEN':     ', '.join([str(n) for n in check]),
-            'NUM_OUTPUTS': num_outputs,
-            'BATCH_SIZE': batch_size,
-            'MAX_EPOCHS': max_epochs,
-        }
-
-        log.info("initializing project %s with ANN %d(%s)%d ...", path, ctx['NUM_INPUTS'], ctx['HIDDEN'], ctx['NUM_OUTPUTS'])
-        os.makedirs(path, exist_ok=True)
-        for tpl in Templates:
-            log.info( "creating %s", tpl.name)
-            with open( os.path.join(path, tpl.name), 'wt' ) as fp:
-                data = tpl.compile(ctx)  
-                fp.write(data)
-
-    @staticmethod
-    def clean(path, full):
-        Dataset.clean(path)
-        if full:
-            # clean everything
-            clean_if_exist(path, ( \
-                '__pycache__',
-                'logs',
-                'model.yml',
-                'model.h5',
-                'model.fdeep',
-                'model.stats', # legacy
-                'stats.txt',
-                'stats.json',
-                'history.json'))
-
     def __init__(self, path):
         # base info
         self.path  = os.path.abspath(path)
