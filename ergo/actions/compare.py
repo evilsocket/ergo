@@ -43,7 +43,7 @@ def generate_reduced_dataset(dataset, size = 10):
 
     size = min(count, 100)
     size = max(count // 100, size)
-    log.info("creating temporal file %s of size %d", temp_name, size)
+    log.info("creating temporary dataset %s of size %d", temp_name, size)
 
     with open(dataset,'r') as inpfile:
         p = float(size)/ count
