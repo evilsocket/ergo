@@ -334,7 +334,7 @@ class Project(object):
             plt.tight_layout()
             plt.savefig( os.path.join(self.path, 'history.png') )
 
-    def view(self):
+    def view(self, img_only = False):
         import matplotlib.pyplot as plt
 
         self._view_model()
@@ -342,7 +342,8 @@ class Project(object):
         self._view_stats()
         self._view_history()
     
-        plt.show()
+        if not img_only:
+            plt.show()
 
 
 
