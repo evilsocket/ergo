@@ -66,8 +66,13 @@ def parse_args(argv):
         help="IP address or hostname to bind to.")
     parser.add_argument("-p", "--port", dest="port", action="store", type=int, default=8080,
         help="TCP port to bind to.")
-    parser.add_argument("-d", "--debug", dest="debug", action="store_true", default=False,
+    parser.add_argument("--debug", dest="debug", action="store_true", default=False,
         help="Enable debug messages.")
+
+    parser.add_argument("--profile", dest="profile", action="store_true", default=False,
+        help="Enable profiler.")
+    parser.add_argument("--prof-max", dest="restrictions", type=int, default=30,
+        help="Maximum number of calls to profile.")
 
     parser.add_argument("--classes", dest="classes", default=None,
         help="Optional comma separated list of output classes.")
@@ -94,5 +99,11 @@ def action_serve(argc, argv):
     else:
         classes = [s.strip() for s in args.classes.split(',') if s.strip() != ""]
         num_outputs = len(classes)
+
+    if args.profile:
+        from werkzeug.contrib.profiler import ProfilerMiddleware
+        args.debug = True
+        app.config['PROFILE'] = True
+        app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[args.restrictions])
 
     app.run(host=args.address, port=args.port, debug=args.debug)
