@@ -31,8 +31,23 @@ def get_input(req):
 
     return None
 
+@app.route('/encode', methods=['POST', 'GET'])
+def encode_route():
+    global prj, classes, num_outputs
+
+    try:
+        xin = get_input(request)
+        if xin is None:
+            return "missing 'x' parameter", 400
+
+        x = prj.logic.prepare_input(xin)
+
+        return jsonify(list(x)), 200
+    except Exception as e:
+        return str(e), 400
+
 @app.route('/', methods=['POST', 'GET'])
-def route():
+def infer_route():
     global prj, classes, num_outputs
 
     try:

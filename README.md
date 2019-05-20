@@ -137,6 +137,12 @@ Or as a file upload:
 
     curl -F 'x=@/path/to/file' "http://localhost:8080/"
 
+The API can also be used to perform encoding only:
+
+    curl -F 'x=@/path/to/file' "http://localhost:8080/encode"
+
+This will return the raw features vector that can be used for inference later.
+
 #### Other commands
 
 To reset the state of a project (**WARNING**: this will remove the datasets, the model files and all training statistics):
