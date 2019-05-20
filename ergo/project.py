@@ -24,13 +24,27 @@ from ergo.templates import Templates
 
 class Project(object):
     @staticmethod
-    def create(path):
-        log.info("initializing project %s ...", path)
+    def create(path, num_inputs = 10, hidden = '30, 30', num_outputs = 2, batch_size = 64, max_epochs = 50):
+        check = [n for n in [int(s.strip()) for s in hidden.split(',') if s.strip() != ""] if n > 0]
+        if len(check) < 1:
+            log.error("the --hidden argument must be a comma separated list of at least one positive integer")
+            quit()
+
+        ctx = {
+            'NUM_INPUTS': num_inputs,
+            'HIDDEN':     ', '.join([str(n) for n in check]),
+            'NUM_OUTPUTS': num_outputs,
+            'BATCH_SIZE': batch_size,
+            'MAX_EPOCHS': max_epochs,
+        }
+
+        log.info("initializing project %s with ANN %d(%s)%d ...", path, ctx['NUM_INPUTS'], ctx['HIDDEN'], ctx['NUM_OUTPUTS'])
         os.makedirs(path, exist_ok=True)
-        for filename, data in Templates.items():
-            log.info( "creating %s", filename)
-            with open( os.path.join(path, filename), 'wt' ) as fp:
-                fp.write(data.strip())
+        for tpl in Templates:
+            log.info( "creating %s", tpl.name)
+            with open( os.path.join(path, tpl.name), 'wt' ) as fp:
+                data = tpl.compile(ctx)  
+                fp.write(data)
 
     @staticmethod
     def clean(path, full):

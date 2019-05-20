@@ -1,3 +1,5 @@
+from ergo.core.template import Template
+
 prepare = \
 """
 import pandas as pd
@@ -29,8 +31,8 @@ from keras.layers import Dense, Activation, Dropout
 
 # build the model
 def build_model(is_train):  
-    n_inputs       = 10
-    n_hidden       = (30, 30,)
+    n_inputs       = {NUM_INPUTS}
+    n_hidden       = [{HIDDEN}]
     dropout        = 0.4
     activation     = 'relu'
     out_activation = 'softmax'
@@ -48,7 +50,7 @@ def build_model(is_train):
         if is_train:
             model.add(Dropout(dropout))
     # setup output layer
-    model.add(Dense(2, activation = out_activation))
+    model.add(Dense({NUM_OUTPUTS}, activation = out_activation))
     
     return model
 """
@@ -73,8 +75,8 @@ def train_model(model, dataset):
 
     earlyStop = EarlyStopping(monitor = 'val_acc', min_delta=0.0001, patience = 5, mode = 'auto')
     return model.fit( dataset.X_train, dataset.Y_train,
-            batch_size = 64,
-            epochs = 50,
+            batch_size = {BATCH_SIZE},
+            epochs = {MAX_EPOCHS},
             verbose = 2,
             validation_data = (dataset.X_val, dataset.Y_val),
             callbacks = [earlyStop])
@@ -92,10 +94,10 @@ gitignore = \
 __pycache__
 """
 
-Templates = { 
-    'prepare.py' : prepare,
-    'model.py'   : model,
-    'train.py'   : train,
-    'requirements.txt': deps,
-    '.gitignore' : gitignore
-}
+Templates = [ 
+    Template('prepare.py', prepare),
+    Template('model.py', model),
+    Template('train.py', train),
+    Template('requirements.txt', deps),
+    Template('.gitignore', gitignore)
+]
