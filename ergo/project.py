@@ -263,7 +263,11 @@ class Project(object):
                     cm = np.array(stats[who]['cm'])
                     tot = cm.sum()
                     cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-                    title = "%s confusion matrix (%d samples)" % (header.strip(" -\n").lower(), tot)
+
+                    name = header.strip(" -\n").lower()
+                    title = "%s confusion matrix (%d samples)" % (name, tot)
+                    filename = os.path.join(self.path, "%s_cm.png" % name)
+
                     plt.figure(title)
                     plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Reds)
                     plt.title(title)
@@ -281,6 +285,7 @@ class Project(object):
                     plt.tight_layout()
                     plt.ylabel('truth')
                     plt.xlabel('prediction')
+                    plt.savefig(filename)
 
     def _view_history(self):
         import matplotlib.pyplot as plt
@@ -305,6 +310,7 @@ class Project(object):
             plt.xlabel('Epoch')
             plt.legend(['Train', 'Test'], loc='upper right')
             plt.tight_layout()
+            plt.savefig( os.path.join(self.path, 'history.png') )
 
     def view(self):
         import matplotlib.pyplot as plt
@@ -314,6 +320,7 @@ class Project(object):
         self._view_history()
     
         plt.show()
+
 
 
 
