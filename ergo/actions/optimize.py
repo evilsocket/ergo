@@ -2,6 +2,7 @@ import os
 import argparse
 import logging as log
 
+from ergo.core.optimizer import optimize_dataset
 from ergo.dataset import Dataset
 
 def probability(x):
@@ -29,5 +30,5 @@ def action_optimize_dataset(argc, argv):
     if not os.path.exists(path):
         log.error("dataset file %s does not exist", path)
         quit()
-
-    Dataset.optimize(path, args.reuse, args.output) 
+    
+    optimize_dataset(path, args.reuse, args.output)

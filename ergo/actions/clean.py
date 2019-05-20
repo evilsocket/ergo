@@ -3,9 +3,6 @@ import argparse
 
 from ergo.core.utils import clean_if_exist
 
-from ergo.project import Project
-from ergo.dataset import Dataset
-
 def parse_args(argv):
     parser = argparse.ArgumentParser(prog="ergo clean", description="Clean a project from temporary datasets and optionally reset it to its initial state.")
 
@@ -18,11 +15,16 @@ def parse_args(argv):
 
 def action_clean(argc, argv):
     args = parse_args(argv)
+    files = [ \
+        'data-train.csv',
+        'data-test.csv',
+        'data-validation.csv',
+        'data-train.pkl',
+        'data-test.pkl',
+        'data-validation.pkl']
 
-    Dataset.clean(args.path)
     if args.all:
-        # clean everything
-        clean_if_exist(args.path, ( \
+        files += [ \
             '__pycache__',
             'logs',
             'model.yml',
@@ -31,10 +33,12 @@ def action_clean(argc, argv):
             'model.stats', # legacy
             'model.png', # legacy
             'test_cm.png',
-            'train_cm.png',
+            'training_cm.png',
             'validation_cm.png',
             'history.png',
             'roc.png',
             'stats.txt',
             'stats.json',
-            'history.json'))
+            'history.json']
+    
+    clean_if_exist(args.path, files)

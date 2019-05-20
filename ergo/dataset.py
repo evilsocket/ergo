@@ -6,27 +6,10 @@ import pandas as pd
 
 from keras.utils import to_categorical
 
-from ergo.core.utils import clean_if_exist
-from ergo.core.optimizer import optimize_dataset
 from ergo.core.saver import Saver
 from ergo.core.loader import Loader
 
 class Dataset(object):
-    @staticmethod
-    def clean(path):
-        data_files = ( \
-                'data-train.csv',
-                'data-test.csv',
-                'data-validation.csv',
-                'data-train.pkl',
-                'data-test.pkl',
-                'data-validation.pkl')
-        clean_if_exist(path, data_files)
-
-    @staticmethod
-    def optimize(path, reuse = 0.15, output = None):
-        optimize_dataset(path, reuse, output)
-
     @staticmethod
     def split_row(row, n_labels, flat):
         x = row.iloc[:,1:].copy()
