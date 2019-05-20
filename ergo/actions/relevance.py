@@ -25,6 +25,8 @@ def parse_args(argv):
 
     parser.add_argument("-d", "--dataset", dest="dataset", action="store", type=str, required=True,
         help="Dataset file to use.")
+    parser.add_argument("-m", "--metric", dest="metric", action="store", type=str, default='precision',
+        help="Which metric to track changes of while performing differential evaluation.")
     parser.add_argument("-a", "--attributes", dest="attributes", action="store", type=str, required=False,
         help="Optional file containing the attribute names, one per line.")
     parser.add_argument("-r", "--ratio", dest="ratio", action="store", type=float, required=False, default=1.0,
@@ -79,7 +81,7 @@ def action_relevance(argc, argv):
     nrows, ncols = X.shape if prj.dataset.is_flat else (X[0].shape[0], len(X))
     attributes   = get_attributes(args.attributes, ncols)
 
-    log.info("computing relevance of %d attributes on %d samples ...", ncols, nrows)
+    log.info("computing relevance of %d attributes on %d samples using '%s' metric ...", ncols, nrows, args.metric)
 
     start = time.time()
 
@@ -99,7 +101,7 @@ def action_relevance(argc, argv):
 
         speed = (1.0 / (time.time() - start)) * nrows
 
-        delta = ref_accu['weighted avg']['precision'] - accu['weighted avg']['precision']
+        delta = ref_accu['weighted avg'][args.metric] - accu['weighted avg'][args.metric]
         tot  += delta
 
         deltas.append((col, delta))
