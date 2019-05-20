@@ -2,19 +2,15 @@ import os
 import sys
 import json
 import re
-import itertools
 import logging as log
 
 import numpy as np
 import pandas as pd
 
-from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
+from sklearn.metrics import classification_report, confusion_matrix
 
 from keras.models import model_from_yaml, load_model
-from keras.utils.vis_utils import plot_model
 from keras.utils.training_utils import multi_gpu_model
-
-import sumpy
 
 from ergo.core.logic import Logic
 from ergo.core.utils import clean_if_exist, serialize_classification_report, serialize_cm
@@ -182,46 +178,9 @@ class Project(object):
         log.info("preparing data from %s ...", filename)
         return self.logic.prepare_dataset(filename)
 
-    def _from_sum(self, source):
-        m = re.findall(r"^sum:\/\/([^@]+)@([^:]+:\d+)$", source)
-        if m is None:
-            raise Exception("no valid source provided, format is: 'sum:///etc/sumd/creds/cert.pem@localhost:50051'")
-
-        conn = m[0][1]
-        cert = m[0][0]
-
-        log.info("connecting to sumd instance %s using certificate %s ...", conn, cert)
-
-        size = 100 * 1024 * 1024
-        opts = [('grpc.max_send_message_length', size), ('grpc.max_receive_message_length', size)]
-
-        cli      = sumpy.Client(conn, cert, opts=opts)
-        per_page = 4096
-        count    = cli.list_records(0, per_page)
-        left     = count.total
-        page     = 1
-        data     = []
-
-        log.info("fetching %d records (%d pages)...", count.total, count.pages)
-
-        while left > 0:
-            log.debug("  page %d/%d (left %d records)", page, count.pages, left)
-            resp = cli.list_records(page, per_page)
-            page += 1
-            for r in resp.records:
-                data.append(r.data)
-                left -= 1
-
-        return pd.DataFrame(data)
-
     def prepare(self, source, p_test, p_val, shuffle = True):
-        if source.startswith('sum://'):
-            data = self._from_sum(source)
-        else:
-            data = self._from_file(source)
-
+        data = self._from_file(source)
         log.info("data shape: %s", data.shape)
-
         return self.dataset.source(data, p_test, p_val, shuffle)
 
     def train(self, gpus):
@@ -258,102 +217,12 @@ class Project(object):
         self._save_history()
         # save model accuracy statistics
         self._save_stats()
-
-    def _view_model(self):
-        if self.model is not None:
-            self.model.summary()
-
-    def _view_roc_curve(self):
-        import matplotlib.pyplot as plt
-
-        if self.dataset.has_test():
-            log.info("found %s, loading ...", self.dataset.test_path)
-            self.dataset.load_test()
-            log.info("computing ROC curve on %d samples ...", len(self.dataset.X_test))
-
-            y_pred = self.model.predict(self.dataset.X_test)
-            fpr, tpr, thresholds = roc_curve(self.dataset.Y_test.ravel(), y_pred.ravel())
-
-            plt.title("ROC Curve")
-            plt.plot([0, 1], [0, 1], 'k--')
-            plt.plot(fpr, tpr, label='AUC = {:.3f}'.format(auc(fpr, tpr)))
-            plt.xlabel('FPR')
-            plt.ylabel('TPR')
-            plt.legend()
-
-            plt.savefig( os.path.join(self.path, 'roc.png') )
-
-            
-    def _view_stats(self):
-        import matplotlib.pyplot as plt
-
-        if os.path.exists(self.txt_stats_path):
-            with open(self.txt_stats_path, 'rt') as fp:
-                print(fp.read().strip())
-
-        if os.path.exists(self.json_stats_path):
-            with open(self.json_stats_path, 'rt') as fp:
-                stats = json.load(fp)
-                for who, header in self.what.items():
-                    orig = np.array(stats[who]['cm'])
-                    cm = np.array(stats[who]['cm'])
-                    tot = cm.sum()
-                    cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-
-                    name = header.strip(" -\n").lower()
-                    title = "%s confusion matrix (%d samples)" % (name, tot)
-                    filename = os.path.join(self.path, "%s_cm.png" % name)
-
-                    plt.figure(title)
-                    plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Reds)
-                    plt.title(title)
-                    plt.colorbar()
-                    classes = range(0, cm.shape[0])
-                    tick_marks = np.arange(len(classes))
-                    plt.xticks(tick_marks, classes, rotation=45)
-                    plt.yticks(tick_marks, classes)
-                    thresh = cm.max() / 2.
-                    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-                        plt.text(j, i, "%.1f%% (%d)" % (cm[i, j] * 100, orig[i, j]),
-                                 horizontalalignment="center",
-                                 color="white" if cm[i, j] > thresh else "black")
-
-                    plt.tight_layout()
-                    plt.ylabel('truth')
-                    plt.xlabel('prediction')
-                    plt.savefig(filename)
-
-    def _view_history(self):
-        import matplotlib.pyplot as plt
-
-        if self.history is not None:
-            plt.figure("training history")
-            # Plot training & validation accuracy values
-            plt.subplot(2,1,1)
-            plt.plot(self.history['acc'])
-            plt.plot(self.history['val_acc'])
-            plt.title('Model accuracy')
-            plt.ylabel('Accuracy')
-            plt.xlabel('Epoch')
-            plt.legend(['Train', 'Test'], loc='lower right')
-
-            # Plot training & validation loss values
-            plt.subplot(2,1,2)
-            plt.plot(self.history['loss'])
-            plt.plot(self.history['val_loss'])
-            plt.title('Model loss')
-            plt.ylabel('Loss')
-            plt.xlabel('Epoch')
-            plt.legend(['Train', 'Test'], loc='upper right')
-            plt.tight_layout()
-            plt.savefig( os.path.join(self.path, 'history.png') )
-
+          
     def view(self, img_only = False):
-        self._view_model()
-        self._view_roc_curve()
-        self._view_stats()
-        self._view_history()
-    
-        if not img_only:
-            import matplotlib.pyplot as plt
-            plt.show()
+        import ergo.views as views
+
+        views.model(self, img_only)
+        views.roc(self, img_only)
+        views.stats(self, img_only)
+        views.history(self, img_only)
+        views.show(img_only)
