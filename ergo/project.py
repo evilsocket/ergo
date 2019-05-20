@@ -274,7 +274,7 @@ class Project(object):
             y_pred = self.model.predict(self.dataset.X_test)
             fpr, tpr, thresholds = roc_curve(self.dataset.Y_test.ravel(), y_pred.ravel())
 
-            plt.figure("ROC/AUC")
+            plt.title("ROC Curve")
             plt.plot([0, 1], [0, 1], 'k--')
             plt.plot(fpr, tpr, label='AUC = {:.3f}'.format(auc(fpr, tpr)))
             plt.xlabel('FPR')
@@ -349,16 +349,11 @@ class Project(object):
             plt.savefig( os.path.join(self.path, 'history.png') )
 
     def view(self, img_only = False):
-        import matplotlib.pyplot as plt
-
         self._view_model()
         self._view_roc_curve()
         self._view_stats()
         self._view_history()
     
         if not img_only:
+            import matplotlib.pyplot as plt
             plt.show()
-
-
-
-
