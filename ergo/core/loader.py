@@ -23,6 +23,11 @@ class Loader(object):
         elif idx == 2:
             self.dataset.validation = self._reader(self.dataset.valid_path)
 
+    def load_test(self):
+        self.dataset.test = self._reader(self.dataset.test_path)
+        self.dataset.n_labels = len(np.unique(self.dataset.test.iloc[:,0].unique()))
+        log.info("detected %d distinct labels", self.dataset.n_labels)
+
     def load(self):
         threads = ( \
           threading.Thread(target=self._worker, args=(0,)),
@@ -38,6 +43,6 @@ class Loader(object):
                 (self.dataset.validation.iloc[:,0].unique(), 
                 self.dataset.test.iloc[:,0].unique(),
                 self.dataset.train.iloc[:,0].unique()) )
-        self.dataset.n_labels  = len(np.unique(u))
+        self.dataset.n_labels = len(np.unique(u))
 
         log.info("detected %d distinct labels", self.dataset.n_labels)

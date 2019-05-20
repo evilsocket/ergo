@@ -7,7 +7,8 @@ import logging as log
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import classification_report, confusion_matrix
+
+from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 
 from keras.models import model_from_yaml, load_model
 from keras.utils.vis_utils import plot_model
@@ -248,6 +249,27 @@ class Project(object):
         if self.model is not None:
             self.model.summary()
 
+    def _view_roc_curve(self):
+        import matplotlib.pyplot as plt
+
+        if self.dataset.has_test():
+            log.info("found %s, loading ...", self.dataset.test_path)
+            self.dataset.load_test()
+            log.info("computing ROC curve on %d samples ...", len(self.dataset.X_test))
+
+            y_pred = self.model.predict(self.dataset.X_test)
+            fpr, tpr, thresholds = roc_curve(self.dataset.Y_test.ravel(), y_pred.ravel())
+
+            plt.figure("ROC/AUC")
+            plt.plot([0, 1], [0, 1], 'k--')
+            plt.plot(fpr, tpr, label='AUC = {:.3f}'.format(auc(fpr, tpr)))
+            plt.xlabel('FPR')
+            plt.ylabel('TPR')
+            plt.legend()
+
+            plt.savefig( os.path.join(self.path, 'roc.png') )
+
+            
     def _view_stats(self):
         import matplotlib.pyplot as plt
 
@@ -316,6 +338,7 @@ class Project(object):
         import matplotlib.pyplot as plt
 
         self._view_model()
+        self._view_roc_curve()
         self._view_stats()
         self._view_history()
     

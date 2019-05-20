@@ -105,6 +105,8 @@ Now it's time to visualize the model structure and how the the `accuracy` and `l
     
     ergo view example
 
+If the `data-test.csv` file is still present in the project folder (`ergo clean` has not been called yet), `ergo view` will also show the ROC curve.
+
 You can use the `relevance` command to evaluate the model on a given set (or a subset of it, see `--ratio 0.1`) by nulling one attribute at a time and measuring how that influenced the accuracy (`feature.names` is an optional file with the names of the attributes, one per line):
 
     ergo relevance example --dataset /some/path/data.csv --attributes /some/path/feature.names --ratio 0.1

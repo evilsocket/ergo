@@ -63,10 +63,19 @@ class Dataset(object):
         self.X          = None
         self.Y          = None
 
+    def has_train(self):
+        return os.path.exists(self.train_path)
+
+    def has_test(self):
+        return os.path.exists(self.test_path)
+
+    def has_validation(self):
+        return os.path.exists(self.valid_path)
+
     def exists(self):
-        return os.path.exists(self.train_path) and \
-               os.path.exists(self.test_path) and \
-               os.path.exists(self.valid_path)
+        return self.has_train() and \
+               self.has_test() and \
+               self.has_validation()
 
     def _set_xys(self, for_training = True):
         if for_training:
@@ -76,7 +85,10 @@ class Dataset(object):
         else:
             self.X, self.Y = Dataset.split_row(self.train, self.n_labels, self.is_flat)
 
-    def load(self):
+    def _set_xys_test(self):
+        self.X_test, self.Y_test = Dataset.split_row(self.test, self.n_labels, self.is_flat)
+
+    def _check_encoding(self):
         pkl_test = self.train_path.replace('.csv', '.pkl')
         if os.path.exists(pkl_test):
             log.info("detected pickle encoded dataset")
@@ -85,6 +97,13 @@ class Dataset(object):
             self.test_path = self.test_path.replace('.csv', '.pkl')
             self.test_path = self.test_path.replace('.csv', '.pkl')
 
+    def load_test(self):
+        self._check_encoding()
+        self.loader.load_test()
+        self._set_xys_test()
+
+    def load(self):
+        self._check_encoding()
         self.loader.load()
         self._set_xys()
 
