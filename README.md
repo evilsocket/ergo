@@ -50,12 +50,11 @@ To print action specific help:
 
     ergo <action> -h
 
+Start by printing the available actions by running `ergo help`, you can also print the software version (ergo, keras and tensorflow versions) and some hardware info with `ergo info` to verify your installation. 
+
 #### Creating a Project
 
-Start by printing the available actions by running `ergo help`, you can also print the software version (ergo, keras 
-and tensorflow versions) and some hardware info with `ergo info` to verify your installation. 
-
-Once ready, create a new project named `example`:
+Once ready, create a new project named `example` (`ergo create -h` to see how to customize the initial model):
 
     ergo create example
 
