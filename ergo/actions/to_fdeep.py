@@ -792,7 +792,8 @@ def convert(in_path, out_path, no_tests=False):
         json_output, allow_nan=False, indent=2, sort_keys=True))
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo to-fdeep", description="Convert the model inside an ergo project to the frugally-deep library format.")
+    parser = argparse.ArgumentParser(prog="ergo to-fdeep", description="Convert the model inside an ergo project to the frugally-deep library format.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("path", help="Path of the project containing the model.")
     args = parser.parse_args(argv)
     return args

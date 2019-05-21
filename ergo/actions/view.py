@@ -5,7 +5,8 @@ import logging as log
 from ergo.project import Project
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo view", description="View the model struture and training statistics.")
+    parser = argparse.ArgumentParser(prog="ergo view", description="View the model struture and training statistics.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("path", help="Path of the project.")
     parser.add_argument( "--img-only", dest="img_only", default=False, action="store_true",
         help="Save plots as PNG files but don't show them in a UI.")

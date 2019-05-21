@@ -73,7 +73,8 @@ def infer_route():
         return str(e), 400
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo serve", description="Load a model and expose an API that can be used to run its inference.")
+    parser = argparse.ArgumentParser(prog="ergo serve", description="Load a model and expose an API that can be used to run its inference.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument("path", help="Path of the project.")
 

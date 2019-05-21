@@ -4,7 +4,8 @@ import argparse
 from ergo.core.utils import clean_if_exist
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo clean", description="Clean a project from temporary datasets and optionally reset it to its initial state.")
+    parser = argparse.ArgumentParser(prog="ergo clean", description="Clean a project from temporary datasets and optionally reset it to its initial state.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument("path", help="Path of the project to clean.")
     parser.add_argument( "-a", "--all", dest="all", action="store_true", default=False,

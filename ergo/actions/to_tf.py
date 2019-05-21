@@ -42,7 +42,8 @@ def freeze_session(session, keep_var_names=None, output_names=None, clear_device
         return frozen_graph
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo to-tf", description="Convert the model inside an ergo project to TensorFlow format.")
+    parser = argparse.ArgumentParser(prog="ergo to-tf", description="Convert the model inside an ergo project to TensorFlow format.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("path", help="Path of the project containing the model.")
     args = parser.parse_args(argv)
     return args

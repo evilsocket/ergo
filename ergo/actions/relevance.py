@@ -19,7 +19,8 @@ def validate_args(args):
         quit()
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo relevance", description="Compute the relevance of each feature of the dataset by differential evaluation.")
+    parser = argparse.ArgumentParser(prog="ergo relevance", description="Compute the relevance of each feature of the dataset by differential evaluation.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument("path", help="Path of the project.")
 

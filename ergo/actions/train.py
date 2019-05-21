@@ -24,7 +24,8 @@ def validate_args(args):
         quit()
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo train", description="Start the training phase of a model.")
+    parser = argparse.ArgumentParser(prog="ergo train", description="Start the training phase of a model.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument("path", help="The path containing the model definition.")
 

@@ -10,7 +10,8 @@ from terminaltables import AsciiTable
 from ergo.project import Project
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo cmp", description="Compare the performances of two models against a given dataset.")
+    parser = argparse.ArgumentParser(prog="ergo cmp", description="Compare the performances of two models against a given dataset.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument("path_1", help="Path of the first project to compare.")
     parser.add_argument("path_2", help="Path of the second project to compare.")

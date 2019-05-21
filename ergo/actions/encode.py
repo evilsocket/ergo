@@ -10,7 +10,8 @@ from ergo.project import Project
 from ergo.core.queue import TaskQueue
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo encode", description="Encode one or more files to vectors and create or update a csv dataset for training.")
+    parser = argparse.ArgumentParser(prog="ergo encode", description="Encode one or more files to vectors and create or update a csv dataset for training.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument("project", help="The path containing the model definition.")
     parser.add_argument("path", help="Path of a single file or of a folder of files.")

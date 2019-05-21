@@ -7,7 +7,8 @@ from ergo.project import Project
 from ergo.templates import Templates
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo create", description="Create a new ergo project.")
+    parser = argparse.ArgumentParser(prog="ergo create", description="Create a new ergo project.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("path", help="Path of the project to create.")
     
     parser.add_argument("-i", "--inputs", dest="num_inputs", action="store", type=int, default=10,

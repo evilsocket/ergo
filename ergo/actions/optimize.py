@@ -12,7 +12,8 @@ def probability(x):
     return x
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo optimize-dataset", description="Remove duplicates from the dataset and only allow them within a given reuse ratio.")
+    parser = argparse.ArgumentParser(prog="ergo optimize-dataset", description="Remove duplicates from the dataset and only allow them within a given reuse ratio.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument("path", help="Path of the project to create.")
 
