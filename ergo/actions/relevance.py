@@ -6,6 +6,7 @@ import numpy as np
 
 from terminaltables import AsciiTable
 
+from ergo.core.queue import TaskQueue
 from ergo.project import Project
 
 # https://stackoverflow.com/questions/11942364/typeerror-integer-is-not-json-serializable-when-serializing-json-in-python
@@ -34,6 +35,10 @@ def parse_args(argv):
         help="Size of the subset of the dataset to use in the (0,1] interval.")
     parser.add_argument("-j", "--to-json", dest="to_json", action="store", type=str, required=False,
         help="Output the relevances to this json file.")
+    parser.add_argument("-w", "--workers", dest="workers", action="store", type=int, default=0,
+        help="If 0, the algorithm will run a single thread iteratively, otherwise create a number of workers " + \
+             "to distribute the computation among, -1 to use the number of logical CPU cores available. WARNING: " + \
+             "The dataset will be copied in memory for each worker."   )
 
     args = parser.parse_args(argv)
     return args
@@ -65,7 +70,38 @@ def restore_feature(X, col, backup, is_scalar_input):
     else:
         X[col] = backup
 
+
+prj    = None
+deltas = []
+tot    = 0
+ncols  = 0
+nrows  = 0
+start  = None
+speed  = 0
+attributes = None
+
+def run_inference_without(X, y, col, flat, ref, metric):
+    global prj, deltas, tot, start, speed, nrows, ncols, attributes
+
+    log.info("[%.2f evals/s] computing relevance for attribute [%d/%d] %s ...", speed, col + 1, ncols, attributes[col])
+
+    copy = X.copy()
+    zeroize_feature(copy, col, flat)
+
+    start = time.time()
+
+    accu, cm = prj.accuracy_for(copy, y, repo_as_dict = True)
+
+    speed = (1.0 / (time.time() - start)) * nrows
+
+    delta = ref - accu['weighted avg'][metric]
+    tot  += delta
+
+    deltas.append((col, delta))
+
 def action_relevance(argc, argv):
+    global prj, deltas, tot, start, speed, nrows, ncols, attributes
+
     args = parse_args(argv)
     prj = Project(args.path)
     err = prj.load()
@@ -78,37 +114,33 @@ def action_relevance(argc, argv):
 
     prj.prepare(args.dataset, 0.0, 0.0)
 
+    # one single worker in blocking mode = serial
+    if args.workers == 0:
+        args.workers = 1
+
     X, y         = prj.dataset.subsample(args.ratio)
     nrows, ncols = X.shape if prj.dataset.is_flat else (X[0].shape[0], len(X))
     attributes   = get_attributes(args.attributes, ncols)
-
-    log.info("computing relevance of %d attributes on %d samples using '%s' metric ...", ncols, nrows, args.metric)
+    queue        = TaskQueue('relevance', num_workers=args.workers, blocking=True)
+   
+    if args.workers == 1:
+        log.info("computing relevance of %d attributes on %d samples using '%s' metric (slow mode) ...", ncols, nrows, args.metric)
+    else:
+        log.info("computing relevance of %d attributes on %d samples using '%s' metric (parallel with %d workers) ...", ncols, nrows, args.metric, queue.num_workers)
 
     start = time.time()
-
     ref_accu, ref_cm = prj.accuracy_for(X, y, repo_as_dict = True)
-    deltas           = []
-    tot              = 0
-    speed            = (1.0 / (time.time() - start)) * nrows
+    speed = (1.0 / (time.time() - start)) * nrows
 
     for col in range(0, ncols):
-        log.info("[%.2f evals/s] computing relevance for attribute [%d/%d] %s ...", speed, col + 1, ncols, attributes[col])
+        queue.add_task( run_inference_without, 
+                X, y, col, prj.dataset.is_flat, 
+                ref_accu['weighted avg'][args.metric], 
+                args.metric) 
 
-        backup = zeroize_feature(X, col, prj.dataset.is_flat)
-
-        start = time.time()
-
-        accu, cm = prj.accuracy_for(X, y, repo_as_dict = True)
-
-        speed = (1.0 / (time.time() - start)) * nrows
-
-        delta = ref_accu['weighted avg'][args.metric] - accu['weighted avg'][args.metric]
-        tot  += delta
-
-        deltas.append((col, delta))
-
-        restore_feature(X, col, backup, prj.dataset.is_flat)
-
+    # wait for all inferences to finish
+    queue.join()
+    # sort relevances by absolute value
     deltas = sorted(deltas, key = lambda x: abs(x[1]), reverse = True)
 
     rels     = []
