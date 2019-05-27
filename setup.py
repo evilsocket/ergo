@@ -6,6 +6,13 @@ import os
 
 desc = 'ergo is a tool that makes deep learning with Keras easier.'
 
+required = []
+with open('requirements.txt') as fp:
+    for line in fp:
+        line = line.strip()
+        if line != "":
+            required.append(line)
+
 setup( name                 = 'ergo-ai',
        version              = __version__,
        description          = desc,
@@ -15,6 +22,7 @@ setup( name                 = 'ergo-ai',
        author_email         = __email__,
        url                  = 'http://www.github.com/evilsocket/ergo',
        packages             = find_packages(),
+       install_requires     = required,
        scripts              = [ 'bin/ergo' ],
        license              = __license__,
        classifiers          = [
