@@ -30,6 +30,7 @@ from ergo.actions.relevance import action_relevance
 from ergo.actions.serve import action_serve
 from ergo.actions.to_fdeep import action_to_fdeep
 from ergo.actions.to_tf import action_to_tf
+from ergo.actions.explore import action_explore
 
 def get_pad(l):
     pad = 0
@@ -63,6 +64,7 @@ ACTIONS = collections.OrderedDict([
     ("serve", Action("serve", "Load a model and expose an API that can be used to run its inference.", action_serve)),
     ("to-fdeep", Action("to-fdeep", "Convert the model inside an ergo project to the frugally-deep library format.", action_to_fdeep)),
     ("to-tf", Action("to-tf", "Convert the model inside an ergo project to TensorFlow format.", action_to_tf)),
+    ("explore", Action("explore", "Explore dataset properties.", action_explore)),
 ])
 
 def main():
