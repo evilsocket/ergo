@@ -97,5 +97,5 @@ def action_explore(argc, argv):
     print_correlation_table(corr)
     pca = calculate_pca(X)
     views.pca_projection(prj, pca, X, y, False)
-
+    views.pca_explained_variance(prj, pca, False)
     views.show(False)

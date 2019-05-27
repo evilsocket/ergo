@@ -102,10 +102,10 @@ def correlation(prj, img_only, attrs):
 
 def pca_projection(prj, pca, X, y, img_only):
     import matplotlib.pyplot as plt
-    import numpy as np
+    from numpy import argmax
     Xt = pca.transform(X)
     Xt = Xt[:,:2]
-    y = np.argmax(y, axis=1)
+    y = argmax(y, axis=1)
 
     cmap = plt.cm.jet
     cmaplist = [cmap(i) for i in range(cmap.N)]
@@ -113,13 +113,42 @@ def pca_projection(prj, pca, X, y, img_only):
 
     fig = plt.figure('PCA decomposition')
     ax = fig.add_subplot(1,1,1)
-    ax.set_xlabel('Principal component 1', fontsize=13)
-    ax.set_ylabel('Principal component 2', fontsize=13)
+    ax.set_xlabel('Principal component 1')
+    ax.set_ylabel('Principal component 2')
     scatter = ax.scatter(Xt[:, 0], Xt[:, 1], c=y, cmap=cmap, label = y)
     legend1 = ax.legend(*scatter.legend_elements(), loc = 'upper right', title = 'Class')
     ax.add_artist(legend1)
     fig.tight_layout()
     fig.savefig( os.path.join(prj.path, 'pca_projection.png'))
+
+
+def pca_explained_variance(prj, pca, img_only):
+    import matplotlib.pyplot as plt
+    exp = pca.explained_variance_ratio_.cumsum()
+
+    exp90, exp95, exp99 = -1, -1, -1
+    for i,j in enumerate(exp):
+        if j >= 0.9 and exp90 == -1:
+            exp90 = i
+        elif j >= 0.95 and exp95 == -1:
+            exp95 = i
+        elif j >= 0.99 and exp99 == -1:
+            exp99 = i
+
+    fig = plt.figure('PCA explained variance')
+    ax = fig.add_subplot(1,1,1)
+    ax.set_xlabel('Principal component number')
+    ax.set_ylabel('Explained variance')
+    ax.plot(exp, '-+')
+
+    # show 90, 95 and 99 % explanation
+    ax.axvline(x=exp90, label='%d PC 90%%' % exp90, linestyle = '--', c='k')
+    ax.axvline(x=exp95, label='%d PC 95%%' % exp95, linestyle = '--', c='b')
+    ax.axvline(x=exp99, label='%d PC 99%%' % exp99, linestyle = '--', c='r')
+    ax.legend(title = 'Required components')
+
+    fig.tight_layout()
+    fig.savefig(os.path.join(prj.path, 'pca_explained_ration.png'))
 
 
 def show(img_only):
