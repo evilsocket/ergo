@@ -2,7 +2,7 @@ import argparse
 from terminaltables import AsciiTable
 import logging as log
 import numpy as np
-import os
+np.seterr(divide='ignore', invalid='ignore')
 
 from ergo.project import Project
 import ergo.views as views
@@ -52,7 +52,7 @@ def compute_correlations_with_target (X,y):
 
 
 def print_correlation_table(corr, min_corr = 0.3):
-    table = [("Column", "Feature", "Correlation")]
+    table = [("Column", "Feature", "Correlation with target")]
     not_relevant = 0
     for at, c, idx in corr:
         if abs(c) < min_corr:

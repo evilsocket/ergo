@@ -139,12 +139,12 @@ def pca_explained_variance(prj, pca, img_only):
     ax = fig.add_subplot(1,1,1)
     ax.set_xlabel('Principal component number')
     ax.set_ylabel('Explained variance')
-    ax.plot(exp, '-+')
+    ax.plot(exp, '-')
 
     # show 90, 95 and 99 % explanation
-    ax.axvline(x=exp90, label='%d PC 90%%' % exp90, linestyle = '--', c='k')
-    ax.axvline(x=exp95, label='%d PC 95%%' % exp95, linestyle = '--', c='b')
-    ax.axvline(x=exp99, label='%d PC 99%%' % exp99, linestyle = '--', c='r')
+    ax.axvline(x=exp90, label='%d PC > 90%%' % exp90, linestyle = '--', c='k')
+    ax.axvline(x=exp95, label='%d PC > 95%%' % exp95, linestyle = '--', c='b')
+    ax.axvline(x=exp99, label='%d PC > 99%%' % exp99, linestyle = '--', c='r')
     ax.legend(title = 'Required components')
 
     fig.tight_layout()
