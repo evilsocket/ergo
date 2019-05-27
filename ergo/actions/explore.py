@@ -22,6 +22,8 @@ def parse_args(argv):
                         help="Size of the subset of the dataset to use in the (0,1] interval.")
     parser.add_argument("-d", "--dataset", dest="dataset", action="store", type=str, required=True,
                         help="Dataset file to use.")
+    parser.add_argument("--img-only", dest="img_only", default=False, action="store_true",
+                        help="Save plots as PNG files but don't show them in a UI.")
     return parser.parse_args(argv)
 
 def get_attributes(filename, ncols):
@@ -96,6 +98,6 @@ def action_explore(argc, argv):
     corr = compute_correlations_with_target(X,y)
     print_correlation_table(corr)
     pca = calculate_pca(X)
-    views.pca_projection(prj, pca, X, y, False)
-    views.pca_explained_variance(prj, pca, False)
-    views.show(False)
+    views.pca_projection(prj, pca, X, y, args.img_only)
+    views.pca_explained_variance(prj, pca, args.img_only)
+    views.show(args.img_only)
