@@ -40,6 +40,9 @@ def action_clean(argc, argv):
             'roc.png',
             'stats.txt',
             'stats.json',
-            'history.json']
+            'history.json',
+            'pca_projection.png',
+            'pca_explained_ration.png'
+        ]
     
     clean_if_exist(args.path, files)
