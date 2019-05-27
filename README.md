@@ -66,6 +66,16 @@ Inside the newly created `example` folder, there will be three files:
 
 By default, ergo will simply read the dataset as a CSV file, build a small neural network with 10 inputs, two hidden layers of 30 neurons each and 2 outputs and use a pretty standard training algorithm.
 
+#### Exploration (optional) 
+
+Explore properties of the dataset. Ergo can generate graphs and tables that can be useful for the feature engineering of the problem. 
+
+Example with a dataset `some/path/data.csv`: 
+    
+    ergo explore example --dataset some/path/data.csv 
+
+This will generate a table with the correlation of each feature with the target feature and the [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis) decomposition of the dataset, saving (and optionally showing) the explained variance vs the number of principal component vectors used and the 2D projection of the dataset (colored by labels). 
+
 #### Encoding (optional)
 
 In case you implemented the `prepare_input` function in the `prepare.py` script, ergo can be used to encode raw samples, being them executables, images, strings or whatever, into vectors of scalars that are then saved into a `dataset.csv` file suitable for training
