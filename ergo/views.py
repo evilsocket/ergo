@@ -94,7 +94,36 @@ def history(prj, img_only):
         plt.tight_layout()
         plt.savefig( os.path.join(prj.path, 'history.png') )
 
+def correlation(prj, img_only, attrs):
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    pass
+
+
+def pca_projection(prj, pca, X, y, img_only):
+    import matplotlib.pyplot as plt
+    import numpy as np
+    Xt = pca.transform(X)
+    Xt = Xt[:,:2]
+    y = np.argmax(y, axis=1)
+
+    cmap = plt.cm.jet
+    cmaplist = [cmap(i) for i in range(cmap.N)]
+    cmap = cmap.from_list('Custom cmap', cmaplist, cmap.N)
+
+    fig = plt.figure('PCA decomposition')
+    ax = fig.add_subplot(1,1,1)
+    ax.set_xlabel('Principal component 1', fontsize=13)
+    ax.set_ylabel('Principal component 2', fontsize=13)
+    scatter = ax.scatter(Xt[:, 0], Xt[:, 1], c=y, cmap=cmap, label = y)
+    legend1 = ax.legend(*scatter.legend_elements(), loc = 'upper right', title = 'Class')
+    ax.add_artist(legend1)
+    fig.tight_layout()
+    fig.savefig( os.path.join(prj.path, 'pca_projection.png'))
+
+
 def show(img_only):
     if not img_only:
         import matplotlib.pyplot as plt
         plt.show()
+

@@ -2,8 +2,10 @@ import argparse
 from terminaltables import AsciiTable
 import logging as log
 import numpy as np
+import os
 
 from ergo.project import Project
+import ergo.views as views
 
 def validate_ratio(args):
     if args.ratio > 1.0 or args.ratio <= 0:
@@ -66,6 +68,12 @@ def print_correlation_table(corr, min_corr = 0.3):
     if not_relevant > 0:
         log.info("%d features have correlation lower than %f with target attribute.", not_relevant, min_corr)
 
+def calculate_pca(X):
+    from sklearn.decomposition import PCA
+    dec = PCA()
+    dec.fit(X)
+    return dec
+
 
 def action_explore(argc, argv):
     global prj, nrows, ncols, attributes
@@ -87,3 +95,7 @@ def action_explore(argc, argv):
     attributes = get_attributes(args.attributes, ncols)
     corr = compute_correlations_with_target(X,y)
     print_correlation_table(corr)
+    pca = calculate_pca(X)
+    views.pca_projection(prj, pca, X, y, False)
+
+    views.show(False)
