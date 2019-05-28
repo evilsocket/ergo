@@ -32,7 +32,9 @@ class Project(object):
         self.txt_stats_path  = os.path.join(self.path, 'stats.txt')
         self.json_stats_path = os.path.join(self.path, 'stats.json')
         self.history_path    = os.path.join(self.path, 'history.json')
+        self.classes_path    = os.path.join(self.path, 'classes.json')
         self.history         = None
+        self.classes         = None
         self.what            = {
             'train' : "Training --------------------------------------------\n",
             'val'   : "Validation ------------------------------------------\n",
@@ -72,7 +74,13 @@ class Project(object):
         if os.path.exists(self.history_path):
             log.debug("loading history from %s ...", self.history_path)
             with open(self.history_path, 'r') as fp:
-                self.history = json.loads(fp.read())
+                self.history = json.load(fp)
+
+
+        if os.path.exists(self.classes_path):
+            log.debug("loading classes from %s ...", self.classes_path)
+            with open(self.classes_path, 'r') as fp:
+                self.classes = {int(k) : v for k, v in json.load(fp).items()}
 
         return None
 

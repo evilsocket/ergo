@@ -27,9 +27,14 @@ def serialize_classification_report(cr):
     measures = tmp[0]
     out = defaultdict(dict)
     for row in tmp[1:]:
+        columns = len(row)
         class_label = row[0].strip()
         for j, m in enumerate(measures):
-            out[class_label][m.strip()] = float(row[j + 1].strip())
+            # fixes https://github.com/evilsocket/ergo/issues/5
+            value = float(row[j + 1].strip()) if j + 1 < columns else None
+            metric = m.strip()
+            out[class_label][metric] = value
+
     return out
 
 def serialize_cm(cm):

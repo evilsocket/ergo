@@ -6,3 +6,4 @@ pydot
 matplotlib
 flask
 terminaltables
+seaborn

@@ -54,6 +54,7 @@ ACTIONS = collections.OrderedDict([
     ("help", Action("help", "Print the usage menu.", action_help)),
     ("info", Action("info", "Print library versions and hardware info.", action_info)),
     ("create", Action("create", "Create a new ergo project.", action_create)),
+    ("explore", Action("explore", "Explore dataset properties.", action_explore)),
     ("encode", Action("encode", "Encode one or more files to vectors and create or update a csv dataset for training.", action_encode)),
     ("optimize-dataset", Action("optimize-dataset", "Remove duplicates from the dataset and only allow them within a given reuse ratio.", action_optimize_dataset)),
     ("train", Action("train", "Start the training phase of a model.", action_train)),
@@ -64,7 +65,6 @@ ACTIONS = collections.OrderedDict([
     ("serve", Action("serve", "Load a model and expose an API that can be used to run its inference.", action_serve)),
     ("to-fdeep", Action("to-fdeep", "Convert the model inside an ergo project to the frugally-deep library format.", action_to_fdeep)),
     ("to-tf", Action("to-tf", "Convert the model inside an ergo project to TensorFlow format.", action_to_tf)),
-    ("explore", Action("explore", "Explore dataset properties.", action_explore)),
 ])
 
 def main():
