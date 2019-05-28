@@ -12,7 +12,7 @@ from ergo.core.loader import Loader
 class Dataset(object):
     @staticmethod
     def split_row(row, n_labels, flat):
-        x = row[:,1:].copy()
+        x = row[:,1:]
         if not flat:
             if len(row[0]) == 1:
                 # this check is to prevent the list comprehension to fail
