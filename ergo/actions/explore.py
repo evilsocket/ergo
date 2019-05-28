@@ -102,6 +102,25 @@ def print_correlation_table(corr, min_corr=0.7):
     print("")
 
 
+def print_stats_table(X):
+    global attributes
+    minv = X.min(axis = 0)
+    maxv = X.max(axis = 0)
+    stdv = X.std(axis = 0)
+
+    table = [("Feature", "Min value", "Max value", "Standard deviation")]
+    constant = []
+    for a, mi, ma, st in zip(attributes, minv, maxv, stdv ):
+        if mi == ma:
+            constant.append(a)
+            continue
+        table.append( (a, mi, ma, st))
+
+    print("Features distribution")
+    print("")
+    print(AsciiTable(table).table)
+    print("")
+    print("The following attributes have constant values: %s" % ', '.join(constant))
 
 
 def action_explore(argc, argv):
@@ -131,5 +150,6 @@ def action_explore(argc, argv):
     corr = calculate_corr(X)
     print_correlation_table(corr, min_corr=0.7)
     views.correlation_matrix(prj, corr, args.img_only)
+    print_stats_table(X)
 
     views.show(args.img_only)
