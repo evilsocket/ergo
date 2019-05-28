@@ -111,7 +111,11 @@ def action_serve(argc, argv):
 
     if args.classes is None:
         num_outputs = prj.model.output.shape[1]
-        classes = ["class_%d" % i for i in range(num_outputs)]
+        if prj.classes is None:
+            classes = ["class_%d" % i for i in range(num_outputs)]
+        else:
+            print(prj.classes)
+            classes = [prj.classes[i] for i in range(num_outputs)]
     else:
         classes = [s.strip() for s in args.classes.split(',') if s.strip() != ""]
         num_outputs = len(classes)
