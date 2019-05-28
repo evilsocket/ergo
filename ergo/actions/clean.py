@@ -42,7 +42,8 @@ def action_clean(argc, argv):
             'stats.json',
             'history.json',
             'pca_projection.png',
-            'pca_explained_ratio.png'
+            'pca_explained_ratio.png',
+            'corr_matrix.png'
         ]
     
     clean_if_exist(args.path, files)
