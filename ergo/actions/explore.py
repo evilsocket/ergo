@@ -35,6 +35,15 @@ def parse_args(argv):
                         help="Process all capabilities of ergo explore (can be time consuming deppending on dataset")
     return parser.parse_args(argv)
 
+def red(s):
+    return "\033[31m" + s + "\033[0m"
+
+def terminal(s):
+    return s
+
+def green(s):
+    return "\033[32m" + s + "\033[0m"
+
 def get_attributes(filename, ncols):
     attributes = []
     if filename is not None:
@@ -91,19 +100,19 @@ def calculate_corr(X):
     return pd.DataFrame(np.corrcoef(X, rowvar=False), columns=attributes, index=attributes)
 
 
-def print_correlation_table(corr, min_corr=0.7):
+def print_correlation_table(corr, min_corr=0.6):
     abs_corr = corr.abs().unstack()
     sorted_corr = abs_corr.sort_values(kind = "quicksort", ascending=False)
     table = [("Feature", "Feature", "Correlation")]
     for idx in sorted_corr.index:
+        color = terminal
         if idx[0] == idx[1]:
             continue
         if sorted_corr.loc[idx] <= min_corr:
             break
         if (idx[1], idx[0], sorted_corr.loc[idx]) in table:
             continue
-        table.append(( idx[0], idx[1], sorted_corr.loc[idx]))
-
+        table.append(( idx[0], idx[1], "%.3f" % sorted_corr.loc[idx]))
     print("")
     log.info("Showing variables with a correlation higher than %f" % min_corr)
     print("")
@@ -119,18 +128,26 @@ def print_stats_table(X):
 
     table = [("Feature", "Min value", "Max value", "Standard deviation")]
     constant = []
+    unormalized = []
     for a, mi, ma, st in zip(attributes, minv, maxv, stdv ):
+        color = terminal
         if mi == ma:
             constant.append(a)
             continue
-        table.append( (a, mi, ma, st))
+        if mi < -1 or ma > 1:
+            color = red
+            unormalized.append(color(a))
+
+        table.append( (color(a), color("%.2e" % mi) , color("%.2e" % ma), color( "%.2e"% st)))
 
     print("")
     log.info("Features distribution:")
     print("")
     print(AsciiTable(table).table)
     print("")
-    print("The following attributes have constant values: %s" % ', '.join(constant))
+    log.warning("The following attributes have constant values: %s" % ', '.join(constant))
+    print("")
+    log.warning("The following features are not normalized: %s" % ', '.join(unormalized))
 
 
 def action_explore(argc, argv):
