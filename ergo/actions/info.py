@@ -4,6 +4,7 @@ import sys
 stderr = sys.stderr
 sys.stderr = open('/dev/null', 'w')
 import keras
+import sklearn
 sys.stderr = stderr 
 
 import tensorflow as tf
@@ -54,6 +55,7 @@ def action_info(argc, argv):
             "version": __version__,
             "keras_version": keras.__version__,
             "tf_version": tf.__version__,
+            'sklean_version': sklearn.__version__,
             "devices":[]
         }
         devs = device_lib.list_local_devices()
@@ -67,7 +69,7 @@ def action_info(argc, argv):
         
         print(json.dumps(info)) 
     else:
-        print(banner.strip("\n") % (__version__, keras.__version__, tf.__version__))
+        print(banner.strip("\n") % (__version__, keras.__version__, tf.__version__, sklearn.__version__))
         print("")
         print("Hardware:\n")
 
