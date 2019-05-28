@@ -41,8 +41,6 @@ def red(s):
 def terminal(s):
     return s
 
-def green(s):
-    return "\033[32m" + s + "\033[0m"
 
 def get_attributes(filename, ncols):
     attributes = []
