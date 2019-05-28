@@ -81,9 +81,15 @@ Explore can show:
 
 Example with a dataset `some/path/data.csv`: 
 
-    ergo explore example --dataset some/path/data.csv
+    ergo explore example --dataset some/path/data.csv -p
 
-This will generate a table with the correlation of each feature with the target feature and    the [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis) decomposition of the     dataset, saving (and optionally showing) the explained variance vs the number of principal     component vectors used and the 2D projection of the dataset (colored by labels).
+This will show the [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis) decomposition of the dataset, saving (and optionally showing) the explained variance vs the number of principal component vectors used and the 2D projection of the dataset (colored by labels).
+
+Specifying:
+    
+    ergo explore example --dataset some/path/data.csv --all 
+
+The full exploratory analysis is performed. 
 
 #### Encoding (optional)
 
