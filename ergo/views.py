@@ -143,7 +143,7 @@ def pca_explained_variance(prj, pca, img_only):
     ax.legend(title = 'Required components')
 
     fig.tight_layout()
-    fig.savefig(os.path.join(prj.path, 'pca_explained_ration.png'))
+    fig.savefig(os.path.join(prj.path, 'pca_explained_ratio.png'))
 
 
 def correlation_matrix(prj, corr, img_only):
