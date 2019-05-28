@@ -84,7 +84,7 @@ def train_model(model, dataset):
 
 deps = \
 """
-ergo
+ergo-ai
 """
 
 gitignore = \
