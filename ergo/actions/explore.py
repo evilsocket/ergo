@@ -104,7 +104,8 @@ def print_correlation_table(corr, min_corr=0.7):
             continue
         table.append(( idx[0], idx[1], sorted_corr.loc[idx]))
 
-    print("Showing variables with a correlation higher than %f" % min_corr)
+    print("")
+    log.info("Showing variables with a correlation higher than %f" % min_corr)
     print("")
     print(AsciiTable(table).table)
     print("")
@@ -124,7 +125,8 @@ def print_stats_table(X):
             continue
         table.append( (a, mi, ma, st))
 
-    print("Features distribution")
+    print("")
+    log.info("Features distribution:")
     print("")
     print(AsciiTable(table).table)
     print("")
