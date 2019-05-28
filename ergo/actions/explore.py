@@ -163,18 +163,23 @@ def action_explore(argc, argv):
     attributes = get_attributes(args.attributes, ncols)
 
     if args.correlations:
+        log.info("computing correlations of each feature with target")
         corr = compute_correlations_with_target(X,y)
         print_target_correlation_table(corr)
+        log.info("computing features crosscorrelation")
         corr = calculate_corr(X)
         print_correlation_table(corr, min_corr=0.7)
         views.correlation_matrix(prj, corr, args.img_only)
 
     if args.pca:
+        log.info("computing pca")
         pca = calculate_pca(X)
+        log.info("computing pca projection")
         views.pca_projection(prj, pca, X, y, args.img_only)
         views.pca_explained_variance(prj, pca, args.img_only)
 
     if args.stats:
+        log.info("computing features stats")
         print_stats_table(X)
 
     views.show(args.img_only)
