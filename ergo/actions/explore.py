@@ -25,6 +25,14 @@ def parse_args(argv):
                         help="Dataset file to use.")
     parser.add_argument("--img-only", dest="img_only", default=False, action="store_true",
                         help="Save plots as PNG files but don't show them in a UI.")
+    parser.add_argument("-s", dest="stats", action="store_true", default=False,
+                        help="Show dataset statistics")
+    parser.add_argument("-c", dest="correlations", action="store_true", default=False,
+                        help="Show correlation tables and graphs")
+    parser.add_argument("-p", dest="pca", action="store_true", default=False,
+                        help="Calculate pca decomposition and explained variance")
+    parser.add_argument("--all", dest="all", action="store_true", default=False,
+                        help="Process all capabilities of ergo explore (can be time consuming deppending on dataset")
     return parser.parse_args(argv)
 
 def get_attributes(filename, ncols):
@@ -127,6 +135,18 @@ def action_explore(argc, argv):
     global prj, nrows, ncols, attributes
 
     args     = parse_args(argv)
+
+    if args.all:
+        args.pca = True
+        args.correlations = True
+        args.stats = True
+
+    if not (args.pca or args.correlations or args.stats):
+        log.error("No exploration action was specified")
+        print("")
+        parse_args(["-h"])
+        quit()
+
     prj = Project(args.path)
     err = prj.load()
     if err is not None:
@@ -141,15 +161,20 @@ def action_explore(argc, argv):
     X, y = prj.dataset.subsample(args.ratio)
     nrows, ncols = X.shape
     attributes = get_attributes(args.attributes, ncols)
-    corr = compute_correlations_with_target(X,y)
-    print_target_correlation_table(corr)
-    pca = calculate_pca(X)
-    views.pca_projection(prj, pca, X, y, args.img_only)
-    views.pca_explained_variance(prj, pca, args.img_only)
 
-    corr = calculate_corr(X)
-    print_correlation_table(corr, min_corr=0.7)
-    views.correlation_matrix(prj, corr, args.img_only)
-    print_stats_table(X)
+    if args.correlations:
+        corr = compute_correlations_with_target(X,y)
+        print_target_correlation_table(corr)
+        corr = calculate_corr(X)
+        print_correlation_table(corr, min_corr=0.7)
+        views.correlation_matrix(prj, corr, args.img_only)
+
+    if args.pca:
+        pca = calculate_pca(X)
+        views.pca_projection(prj, pca, X, y, args.img_only)
+        views.pca_explained_variance(prj, pca, args.img_only)
+
+    if args.stats:
+        print_stats_table(X)
 
     views.show(args.img_only)
