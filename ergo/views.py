@@ -110,7 +110,7 @@ def pca_projection(prj, pca, X, y, img_only):
     ax = fig.add_subplot(1,1,1)
     ax.set_xlabel('Principal component 1')
     ax.set_ylabel('Principal component 2')
-    scatter = ax.scatter(Xt[:, 0], Xt[:, 1], c=y, cmap=cmap, label = y)
+    scatter = ax.scatter(Xt[:, 0], Xt[:, 1], c=y, cmap=cmap, label = y, s=5, alpha=0.5)
     legend1 = ax.legend(*scatter.legend_elements(), loc = 'upper right', title = 'Class')
     ax.add_artist(legend1)
     fig.tight_layout()
@@ -150,7 +150,6 @@ def correlation_matrix(prj, corr, img_only):
     import numpy as np
     import seaborn as sns
     import matplotlib.pyplot as plt
-    import pandas as pd
 
     sns.set(style="white")
     mask = np.zeros_like(corr, dtype=np.bool)
@@ -158,7 +157,7 @@ def correlation_matrix(prj, corr, img_only):
 
     fig, ax = plt.subplots()
     cmap = sns.diverging_palette(220, 10, as_cmap=True)
-    sns.heatmap(corr, square = True, mask=mask, cmap=cmap)
+    sns.heatmap(corr, square = True, mask=mask, cmap=cmap,cbar_kws={"shrink": .7})
     fig.savefig(os.path.join(prj.path, 'corr_matrix.png'))
 
 def show(img_only):
