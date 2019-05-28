@@ -1,6 +1,7 @@
 import threading
 import logging as log
 import pickle
+import numpy as np
 
 class Saver(object):
     def __init__(self, dataset):
@@ -14,7 +15,8 @@ class Saver(object):
         if not flat:
             pickle.dump( v, open( filename, "wb" ) )
         else:
-            v.to_csv(filename, sep = ',', header = None, index = None, chunksize=512)
+            np.savetxt(filename, v, delimiter=',')
+            #v.to_csv(filename, sep = ',', header = None, index = None, chunksize=512)
 
     def save(self):
         train_path = self.dataset.train_path

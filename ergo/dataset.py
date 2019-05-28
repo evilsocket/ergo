@@ -12,16 +12,16 @@ from ergo.core.loader import Loader
 class Dataset(object):
     @staticmethod
     def split_row(row, n_labels, flat):
-        x = row.iloc[:,1:].copy()
+        x = row[:,1:].copy()
         if not flat:
-            if len(row) == 1:
+            if len(row[0]) == 1:
                 # this check is to prevent the list comprehension to fail
                 # shouldn't happen in production but can fail on test
                 log.error("Dataset size must be greater than 1")
                 quit()
             x = [ np.squeeze(np.array( [ x[i][:]] ), axis = 0)
                    for i in x.columns ]
-        y = to_categorical(row.values[:,0], n_labels)
+        y = to_categorical(row[:,0], n_labels)
         return x, y
 
     def __init__(self, path):
@@ -102,20 +102,22 @@ class Dataset(object):
     def source(self, data, p_test = 0.0, p_val = 0.0, shuffle = True):
         if shuffle:
             # reset indexes and resample data just in case
-            dataset = data.sample(frac = 1).reset_index(drop = True)
+            #dataset = data.sample(frac = 1).reset_index(drop = True)
+            idx = np.random.choice(data.shape[0], data.shape[0], replace=False)
+            dataset = data[idx, :]
         else:
             dataset = data
 
         # check if the input vectors are made of scalars or other vectors
         self.is_flat = True
-        for x in dataset.iloc[0,:]:
+        for x in dataset[0,:]:
             if not self._is_scalar_value(x):
                 log.info("detected non scalar input: %s", x.shape)
                 self.is_flat = False
                 break
 
         # count unique labels on first column
-        self.n_labels = len(dataset.iloc[:,0].unique())
+        self.n_labels = len(np.unique(dataset[:,0]))
         # if both values are zero, we're just loading a single file,
         # otherwise we want to generate training temporary datasets.
         for_training = p_test > 0.0 and p_val > 0.0
@@ -129,9 +131,9 @@ class Dataset(object):
             n_test  = int(n_tot * p_test)
             n_val   = int(n_tot * p_val)
 
-            self.train      = dataset.head(n_train)
-            self.test       = dataset.head(n_train + n_test).tail(n_test)
-            self.validation = dataset.tail(n_val)
+            self.train      = dataset[:n_train,:]
+            self.test       = dataset[n_train : n_train + n_test, :]
+            self.validation = dataset[n_train + n_test :, :]
 
             if self.do_save:
                 self.saver.save()
@@ -141,7 +143,7 @@ class Dataset(object):
         self._set_xys(for_training)
 
     def subsample(self, ratio):
-        X = self.X.values if self.is_flat else self.X
+        X = self.X #if self.is_flat else self.X
         y = self.Y
         if ratio < 1.0:
             log.info("selecting a randomized sample of %d%% ...", ratio * 100)
@@ -150,7 +152,7 @@ class Dataset(object):
             num      = int(tot_rows * ratio)
             indexes  = np.random.choice(tot_rows, num, replace = False)
 
-            X = X[indexes] if self.is_flat else [ i[indexes] for i in X ]
+            X = X[indexes,:] if self.is_flat else [ i[indexes, :] for i in X ]
             y = y[indexes]
 
         return X, y
