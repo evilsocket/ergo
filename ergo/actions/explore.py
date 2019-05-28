@@ -2,6 +2,7 @@ import argparse
 from terminaltables import AsciiTable
 import logging as log
 import numpy as np
+import pandas as pd
 np.seterr(divide='ignore', invalid='ignore')
 
 from ergo.project import Project
@@ -53,7 +54,7 @@ def compute_correlations_with_target (X,y):
     return corr
 
 
-def print_correlation_table(corr, min_corr = 0.3):
+def print_target_correlation_table(corr, min_corr = 0.3):
     table = [("Column", "Feature", "Correlation with target")]
     not_relevant = 0
     for at, c, idx in corr:
@@ -77,6 +78,32 @@ def calculate_pca(X):
     return dec
 
 
+def calculate_corr(X):
+    global attributes
+    return pd.DataFrame(np.corrcoef(X, rowvar=False), columns=attributes, index=attributes)
+
+
+def print_correlation_table(corr, min_corr=0.7):
+    abs_corr = corr.abs().unstack()
+    sorted_corr = abs_corr.sort_values(kind = "quicksort", ascending=False)
+    table = [("Feature", "Feature", "Correlation")]
+    for idx in sorted_corr.index:
+        if idx[0] == idx[1]:
+            continue
+        if sorted_corr.loc[idx] <= min_corr:
+            break
+        if (idx[1], idx[0], sorted_corr.loc[idx]) in table:
+            continue
+        table.append(( idx[0], idx[1], sorted_corr.loc[idx]))
+
+    print("Showing variables with a correlation higher than %f" % min_corr)
+    print("")
+    print(AsciiTable(table).table)
+    print("")
+
+
+
+
 def action_explore(argc, argv):
     global prj, nrows, ncols, attributes
 
@@ -96,8 +123,13 @@ def action_explore(argc, argv):
     nrows, ncols = X.shape
     attributes = get_attributes(args.attributes, ncols)
     corr = compute_correlations_with_target(X,y)
-    print_correlation_table(corr)
+    print_target_correlation_table(corr)
     pca = calculate_pca(X)
     views.pca_projection(prj, pca, X, y, args.img_only)
     views.pca_explained_variance(prj, pca, args.img_only)
+
+    corr = calculate_corr(X)
+    print_correlation_table(corr, min_corr=0.7)
+    views.correlation_matrix(prj, corr, args.img_only)
+
     views.show(args.img_only)

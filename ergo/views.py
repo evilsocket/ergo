@@ -94,11 +94,6 @@ def history(prj, img_only):
         plt.tight_layout()
         plt.savefig( os.path.join(prj.path, 'history.png') )
 
-def correlation(prj, img_only, attrs):
-    import seaborn as sns
-    import matplotlib.pyplot as plt
-    pass
-
 
 def pca_projection(prj, pca, X, y, img_only):
     import matplotlib.pyplot as plt
@@ -150,6 +145,21 @@ def pca_explained_variance(prj, pca, img_only):
     fig.tight_layout()
     fig.savefig(os.path.join(prj.path, 'pca_explained_ration.png'))
 
+
+def correlation_matrix(prj, corr, img_only):
+    import numpy as np
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    sns.set(style="white")
+    mask = np.zeros_like(corr, dtype=np.bool)
+    mask[np.triu_indices_from(mask)] = True
+
+    fig, ax = plt.subplots()
+    cmap = sns.diverging_palette(220, 10, as_cmap=True)
+    sns.heatmap(corr, square = True, mask=mask, cmap=cmap)
+    fig.savefig(os.path.join(prj.path, 'corr_matrix.png'))
 
 def show(img_only):
     if not img_only:
