@@ -795,6 +795,8 @@ def parse_args(argv):
     parser = argparse.ArgumentParser(prog="ergo to-fdeep", description="Convert the model inside an ergo project to the frugally-deep library format.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("path", help="Path of the project containing the model.")
+    parser.add_argument("--no-tests", dest=no_tests, action="store_true", default=False,
+            help="Don't generate tests in fdeep")
     args = parser.parse_args(argv)
     return args
 
@@ -809,5 +811,5 @@ def action_to_fdeep(argc, argv):
         log.error("no trained model found for this project")
         quit()
 
-    convert(prj.weights_path, prj.fdeep_path)
+    convert(prj.weights_path, prj.fdeep_path, args.no_tests)
 
