@@ -17,10 +17,17 @@ def clean_if_exist(path, files):
                 log.info("removing file %s", filename)
                 os.remove(filename)
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
 def serialize_classification_report(cr):
     tmp = list()
     for row in cr.split("\n"):
-        parsed_row = [x for x in row.split("  ") if len(x) > 0]
+        parsed_row = [x.strip() for x in row.split("  ") if len(x.strip()) > 0]
         if len(parsed_row) > 0:
             tmp.append(parsed_row)
     
@@ -30,10 +37,10 @@ def serialize_classification_report(cr):
         columns      = len(row)
         class_label  = row[0].strip()
         num_measures = len(measures)
-
+        
         # fixes https://github.com/evilsocket/ergo/issues/5
-        while columns < num_measures:
-            row = [None] + row
+        while columns < num_measures + 1:
+            row.insert(1, None)
             columns += 1
 
         for j, m in enumerate(measures):
