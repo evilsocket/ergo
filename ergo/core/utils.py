@@ -27,11 +27,18 @@ def serialize_classification_report(cr):
     measures = tmp[0]
     out = defaultdict(dict)
     for row in tmp[1:]:
-        columns = len(row)
-        class_label = row[0].strip()
+        columns      = len(row)
+        class_label  = row[0].strip()
+        num_measures = len(measures)
+
+        # fixes https://github.com/evilsocket/ergo/issues/5
+        while columns < num_measures:
+            row = [None] + row
+            columns += 1
+
         for j, m in enumerate(measures):
-            # fixes https://github.com/evilsocket/ergo/issues/5
-            value = float(row[j + 1].strip()) if j + 1 < columns else None
+            v = row[j + 1]
+            value = float(v.strip()) if v is not None else None
             metric = m.strip()
             out[class_label][metric] = value
 
