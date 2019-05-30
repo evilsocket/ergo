@@ -94,7 +94,7 @@ def history(prj, img_only):
         plt.tight_layout()
         plt.savefig( os.path.join(prj.path, 'history.png') )
 
-def plot_clusters(prj, pca, X, y, ca):
+def plot_clusters(prj, pca, X, y, ca, img_only):
     import matplotlib.pyplot as plt
     from numpy import argmax
     from matplotlib.lines import Line2D
@@ -139,7 +139,7 @@ def plot_clusters(prj, pca, X, y, ca):
     fig.tight_layout()
     fig.savefig(os.path.join(prj.path, 'clusters_projection.png'))
 
-def pca_projection(prj, pca, X, y):
+def pca_projection(prj, pca, X, y, img_only):
     import matplotlib.pyplot as plt
     from numpy import argmax
     Xt = pca.transform(X)
