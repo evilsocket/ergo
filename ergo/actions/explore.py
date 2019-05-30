@@ -31,6 +31,8 @@ def parse_args(argv):
                         help="Show correlation tables and graphs")
     parser.add_argument("-p", dest="pca", action="store_true", default=False,
                         help="Calculate pca decomposition and explained variance")
+    parser.add_argument("-k", dest="cluster", action="store_true", default=False,
+                        help="Clustering analysis")
     parser.add_argument("--all", dest="all", action="store_true", default=False,
                         help="Process all capabilities of ergo explore (can be time consuming deppending on dataset")
     return parser.parse_args(argv)
@@ -103,7 +105,6 @@ def print_correlation_table(corr, min_corr=0.6):
     sorted_corr = abs_corr.sort_values(kind = "quicksort", ascending=False)
     table = [("Feature", "Feature", "Correlation")]
     for idx in sorted_corr.index:
-        color = terminal
         if idx[0] == idx[1]:
             continue
         if sorted_corr.loc[idx] <= min_corr:
@@ -148,6 +149,14 @@ def print_stats_table(X):
     log.warning("The following features are not normalized: %s" % ', '.join(unormalized))
 
 
+def cluster_data(X, n_clusters):
+    from sklearn.cluster import KMeans
+    km = KMeans(n_clusters = n_clusters)
+    km.fit(X)
+    return km
+
+
+
 def action_explore(argc, argv):
     global prj, nrows, ncols, attributes
 
@@ -157,8 +166,9 @@ def action_explore(argc, argv):
         args.pca = True
         args.correlations = True
         args.stats = True
+        args.cluster = True
 
-    if not (args.pca or args.correlations or args.stats):
+    if not (args.pca or args.correlations or args.stats or args.cluster):
         log.error("No exploration action was specified")
         print("")
         parse_args(["-h"])
@@ -198,5 +208,14 @@ def action_explore(argc, argv):
     if args.stats:
         log.info("computing features stats")
         print_stats_table(X)
+
+    if args.cluster:
+        if not args.pca:
+            log.info("computing pca to plot clusters")
+            pca = calculate_pca(X)
+        n_clust = len(set(np.argmax(y, axis = 1)))
+        log.info("computing kmeans clustering with k=%d" % n_clust)
+        ca = cluster_data(X, n_clust)
+        views.plot_clusters(prj, pca, X, y, ca)
 
     views.show(args.img_only)

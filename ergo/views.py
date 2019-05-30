@@ -94,8 +94,52 @@ def history(prj, img_only):
         plt.tight_layout()
         plt.savefig( os.path.join(prj.path, 'history.png') )
 
+def plot_clusters(prj, pca, X, y, ca):
+    import matplotlib.pyplot as plt
+    from numpy import argmax
+    from matplotlib.lines import Line2D
 
-def pca_projection(prj, pca, X, y, img_only):
+    Xt = pca.transform(X)
+    Xt = Xt[:, :2]
+    y = argmax(y, axis=1)
+
+    clusters = ca.labels_
+    cmap = plt.cm.jet
+    cmaplist = [cmap(i) for i in range(0, cmap.N, cmap.N//len(set(clusters)))]
+    cmap = cmap.from_list('Custom cmap', cmaplist, cmap.N)
+
+    fig = plt.figure('Clustering Analisys')
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_xlabel('Principal component 1')
+    ax.set_ylabel('Principal component 2')
+
+    markers = [m for m, func in Line2D.markers.items()
+                        if func != 'nothing' and m in Line2D.filled_markers]
+    _legends = []
+    for cl in list(set(y)):
+        idx =  np.where(y == cl)[0]
+        scatter = ax.scatter(Xt[idx,0], Xt[idx,1], cmap = cmap, s = 40, alpha = 0.5,
+                             c = clusters[idx],
+                             marker = markers[cl],
+                             label=y[idx],
+                             edgecolor='black'
+                  )
+        l = Line2D([], [], color='black', marker=markers[cl], linestyle='None',
+                          markersize=5, mfc = 'w', markeredgecolor = 'black', label='Class %d' % cl)
+        _legends.append(l)
+
+    for cl in list(set(clusters)):
+        l = Line2D([], [], color= cmaplist[cl], marker='o', linestyle='None',
+                          markersize=5,  label='Cluster %d' % cl)
+        _legends.append(l)
+
+    legend1 = ax.legend(handles=_legends, loc='upper left')
+    ax.add_artist(legend1)
+
+    fig.tight_layout()
+    fig.savefig(os.path.join(prj.path, 'clusters_projection.png'))
+
+def pca_projection(prj, pca, X, y):
     import matplotlib.pyplot as plt
     from numpy import argmax
     Xt = pca.transform(X)
@@ -110,6 +154,7 @@ def pca_projection(prj, pca, X, y, img_only):
     ax = fig.add_subplot(1,1,1)
     ax.set_xlabel('Principal component 1')
     ax.set_ylabel('Principal component 2')
+
     scatter = ax.scatter(Xt[:, 0], Xt[:, 1], c=y, cmap=cmap, label = y, s=5, alpha=0.5)
     legend1 = ax.legend(*scatter.legend_elements(), loc = 'upper right', title = 'Class')
     ax.add_artist(legend1)
