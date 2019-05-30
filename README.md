@@ -75,15 +75,16 @@ Explore can show:
 1. Metrics of each feature (min, max, standard deviation) - Which can be used to discard constant features in the dataset. 
 2. Feature correlation of each feature with the target - Which can give an idea of how good is feature is as a linear predictor.
 3. Feature correlation matrix.
-4. PCA decomposition: 
+4. [PCA decomposition](https://en.wikipedia.org/wiki/Principal_component_analysis): 
     * 2D projection of the data based on classes.
-    * Explained variance of each principal component with 90, 95 and 99 % explanation values.5. Kmeans clustering of the data
+    * Explained variance of each principal component with 90, 95 and 99 % explanation values.    
+5. [Kmeans clustering](https://en.wikipedia.org/wiki/K-means_clustering) of the data
 
 Example with a dataset `some/path/data.csv`: 
 
     ergo explore example --dataset some/path/data.csv -p
 
-This will show the [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis) decomposition of the dataset, saving (and optionally showing) the explained variance vs the number of principal component vectors used and the 2D projection of the dataset (colored by labels).
+This will show the PCA decomposition of the dataset, saving (and optionally showing) the explained variance vs the number of principal component vectors used and the 2D projection of the dataset (colored by labels).
 
 A full exploratory analysis can be performed using the `--all` flag:
     
