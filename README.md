@@ -77,7 +77,7 @@ Explore can show:
 3. Feature correlation matrix.
 4. PCA decomposition: 
     * 2D projection of the data based on classes.
-    * Explained variance of each principal component with 90, 95 and 99 % explanation values.
+    * Explained variance of each principal component with 90, 95 and 99 % explanation values.5. Kmeans clustering of the data
 
 Example with a dataset `some/path/data.csv`: 
 
