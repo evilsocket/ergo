@@ -209,9 +209,9 @@ def action_explore(argc, argv):
         log.info("computing pca")
         pca = calculate_pca(X)
         log.info("computing pca projection")
-        views.pca_projection(prj, pca, X, y, args.img_only)
+        views.pca_projection(prj, pca, X, y, False)
         if args.D3:
-            views.pca_projection_3D(prj, pca, X, y, args.img_only)
+            views.pca_projection(prj, pca, X, y, args.D3)
         views.pca_explained_variance(prj, pca, args.img_only)
 
     if args.stats:
@@ -226,8 +226,8 @@ def action_explore(argc, argv):
             args.nclusters = len(set(np.argmax(y, axis = 1)))
         log.info("computing kmeans clustering with k=%d" % args.nclusters)
         ca = cluster_data(X, args.nclusters)
-        views.plot_clusters(prj, pca, X, y, ca, args.img_only)
+        views.plot_clusters(prj, pca, X, y, ca, False)
         if args.D3:
-            views.plot_clusters_3D(prj, pca, X, y, ca, args.img_only)
+            views.plot_clusters(prj, pca, X, y, ca, args.D3)
 
     views.show(args.img_only)
