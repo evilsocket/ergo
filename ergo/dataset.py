@@ -47,13 +47,13 @@ class Dataset(object):
         self.Y          = None
 
     def has_train(self):
-        return os.path.exists(self.train_path)
+        return os.path.exists(self.train_path) or os.path.exists(self.train_path.replace('.csv', '.pkl'))
 
     def has_test(self):
-        return os.path.exists(self.test_path)
+        return os.path.exists(self.test_path) or os.path.exists(self.test_path.replace('.csv', '.pkl'))
 
     def has_validation(self):
-        return os.path.exists(self.valid_path)
+        return os.path.exists(self.valid_path) or os.path.exists(self.validation_path.replace('.csv', '.pkl'))
 
     def exists(self):
         return self.has_train() and \
