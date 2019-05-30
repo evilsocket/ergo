@@ -33,6 +33,8 @@ def parse_args(argv):
                         help="Calculate pca decomposition and explained variance")
     parser.add_argument("-k", dest="cluster", action="store_true", default=False,
                         help="Clustering analysis")
+    parser.add_argument("-n", dest="nclusters", action="store", required = False, type=int,
+                        help="Number of clusters for Kmeans algorithm")
     parser.add_argument("--all", dest="all", action="store_true", default=False,
                         help="Process all capabilities of ergo explore (can be time consuming deppending on dataset")
     return parser.parse_args(argv)
@@ -168,6 +170,9 @@ def action_explore(argc, argv):
         args.stats = True
         args.cluster = True
 
+    if args.nclusters and not args.cluster:
+        log.warning("number of clusters specified but clustering won't be perfomed")
+
     if not (args.pca or args.correlations or args.stats or args.cluster):
         log.error("No exploration action was specified")
         print("")
@@ -213,9 +218,10 @@ def action_explore(argc, argv):
         if not args.pca:
             log.info("computing pca to plot clusters")
             pca = calculate_pca(X)
-        n_clust = len(set(np.argmax(y, axis = 1)))
-        log.info("computing kmeans clustering with k=%d" % n_clust)
-        ca = cluster_data(X, n_clust)
+        if not args.nclusters:
+            args.nclusters = len(set(np.argmax(y, axis = 1)))
+        log.info("computing kmeans clustering with k=%d" % args.nclusters)
+        ca = cluster_data(X, args.nclusters)
         views.plot_clusters(prj, pca, X, y, ca)
 
     views.show(args.img_only)
