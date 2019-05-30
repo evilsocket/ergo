@@ -35,6 +35,8 @@ def parse_args(argv):
                         help="Clustering analysis")
     parser.add_argument("-n", dest="nclusters", action="store", required = False, type=int,
                         help="Number of clusters for Kmeans algorithm")
+    parser.add_argument("--3D", dest="D3", action="store_true", default=False,
+                        help="Plot 3D projections of the data")
     parser.add_argument("--all", dest="all", action="store_true", default=False,
                         help="Process all capabilities of ergo explore (can be time consuming deppending on dataset")
     return parser.parse_args(argv)
@@ -158,7 +160,6 @@ def cluster_data(X, n_clusters):
     return km
 
 
-
 def action_explore(argc, argv):
     global prj, nrows, ncols, attributes
 
@@ -169,6 +170,7 @@ def action_explore(argc, argv):
         args.correlations = True
         args.stats = True
         args.cluster = True
+        args.D3 = True
 
     if args.nclusters and not args.cluster:
         log.warning("number of clusters specified but clustering won't be perfomed")
@@ -208,6 +210,8 @@ def action_explore(argc, argv):
         pca = calculate_pca(X)
         log.info("computing pca projection")
         views.pca_projection(prj, pca, X, y, args.img_only)
+        if args.D3:
+            views.pca_projection_3D(prj, pca, X, y, args.img_only)
         views.pca_explained_variance(prj, pca, args.img_only)
 
     if args.stats:
@@ -222,6 +226,8 @@ def action_explore(argc, argv):
             args.nclusters = len(set(np.argmax(y, axis = 1)))
         log.info("computing kmeans clustering with k=%d" % args.nclusters)
         ca = cluster_data(X, args.nclusters)
-        views.plot_clusters(prj, pca, X, y, ca)
+        views.plot_clusters(prj, pca, X, y, ca, args.img_only)
+        if args.D3:
+            views.plot_clusters_3D(prj, pca, X, y, ca, args.img_only)
 
     views.show(args.img_only)
