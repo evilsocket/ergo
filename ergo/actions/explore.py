@@ -32,8 +32,10 @@ def parse_args(argv):
     parser.add_argument("-p", dest="pca", action="store_true", default=False,
                         help="Calculate pca decomposition and explained variance")
     parser.add_argument("-k", dest="cluster", action="store_true", default=False,
-                        help="Clustering analysis")
-    parser.add_argument("-n", dest="nclusters", action="store", required = False, type=int,
+                        help="Perform clustering analysis")
+    parser.add_argument("--algorithm", dest="cluster_alg", choices=['kmeans', 'dbscan'], default='kmeans', const='kmeans', nargs='?',
+                        help="Algorithm for clustering analysis")
+    parser.add_argument("-n", dest="nclusters", action="store", required = False, type=float,
                         help="Number of clusters for Kmeans algorithm")
     parser.add_argument("--3D", dest="D3", action="store_true", default=False,
                         help="Plot 3D projections of the data")
@@ -153,12 +155,18 @@ def print_stats_table(X):
     log.warning("The following features are not normalized: %s" % ', '.join(unormalized))
 
 
-def cluster_data(X, n_clusters):
+def kmeans_clustering(X, n_clusters):
     from sklearn.cluster import KMeans
     km = KMeans(n_clusters = n_clusters)
     km.fit(X)
     return km
 
+
+def dbscan_clustering(X, var):
+    from sklearn.cluster import DBSCAN
+    db = DBSCAN(var, min_samples=100)
+    db.fit(X)
+    return db
 
 def action_explore(argc, argv):
     global prj, nrows, ncols, attributes
@@ -219,13 +227,17 @@ def action_explore(argc, argv):
         print_stats_table(X)
 
     if args.cluster:
+        if args.cluster_alg == 'kmeans':
+            cluster_alg = kmeans_clustering
+        elif args.cluster_alg == 'dbscan':
+            cluster_alg = dbscan_clustering
         if not args.pca:
             log.info("computing pca to plot clusters")
             pca = calculate_pca(X)
         if not args.nclusters:
             args.nclusters = len(set(np.argmax(y, axis = 1)))
         log.info("computing kmeans clustering with k=%d" % args.nclusters)
-        ca = cluster_data(X, args.nclusters)
+        ca = cluster_alg(X, args.nclusters)
         views.plot_clusters(prj, pca, X, y, ca, False)
         if args.D3:
             views.plot_clusters(prj, pca, X, y, ca, args.D3)
