@@ -98,6 +98,7 @@ def plot_clusters(prj, pca, X, y, ca, D3 = False):
     import matplotlib.pyplot as plt
     from numpy import argmax
     from matplotlib.lines import Line2D
+    from mpl_toolkits.mplot3d import axes3d
 
     Xt = pca.transform(X)
     Xt = Xt[:, :3]
@@ -142,8 +143,11 @@ def plot_clusters(prj, pca, X, y, ca, D3 = False):
         _legends.append(l)
 
     for cl in list(set(clusters)):
+        label = 'Cluster %d' % cl
+        if cl == -1:
+            label = 'Noisy samples'
         l = Line2D([], [], color= cmaplist[cl], marker='o', linestyle='None',
-                          markersize=5,  label='Cluster %d' % cl)
+                          markersize=5,  label=label)
         _legends.append(l)
 
     legend1 = ax.legend(handles=_legends, loc='upper left')
