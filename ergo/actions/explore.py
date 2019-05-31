@@ -229,14 +229,19 @@ def action_explore(argc, argv):
     if args.cluster:
         if args.cluster_alg == 'kmeans':
             cluster_alg = kmeans_clustering
+            if not args.nclusters:
+                args.nclusters = len(set(np.argmax(y, axis=1)))
+            args.nclusters = int(args.nclusters)
+            log.info("computing kmeans clustering with k=%d" % args.nclusters)
         elif args.cluster_alg == 'dbscan':
             cluster_alg = dbscan_clustering
+            if not args.nclusters:
+                args.nclusters = 2
+            log.info("computing dbscan clustering with eps=%f" % args.nclusters)
         if not args.pca:
             log.info("computing pca to plot clusters")
             pca = calculate_pca(X)
-        if not args.nclusters:
-            args.nclusters = len(set(np.argmax(y, axis = 1)))
-        log.info("computing kmeans clustering with k=%d" % args.nclusters)
+
         ca = cluster_alg(X, args.nclusters)
         views.plot_clusters(prj, pca, X, y, ca, False)
         if args.D3:
