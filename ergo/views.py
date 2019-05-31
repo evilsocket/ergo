@@ -160,6 +160,17 @@ def plot_clusters(prj, pca, X, y, ca, D3 = False):
         name = 'clusters_projection.png'
     fig.savefig(os.path.join(prj.path, name))
 
+def plot_intertia(prj, x, y):
+    import matplotlib.pyplot as plt
+
+    fig = plt.figure("Inertia of Kmeans clustering algorithm")
+    ax = fig.add_subplot(1,1,1)
+    ax.set_xlabel('# of clusters')
+    ax.set_ylabel('Intertia')
+    ax.plot(x,y, '*-')
+    fig.savefig(os.path.join(prj.path, 'kmeans_inertia.png'))
+
+
 def pca_projection(prj, pca, X, y, D3):
     import matplotlib.pyplot as plt
     from numpy import argmax

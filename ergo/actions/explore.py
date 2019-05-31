@@ -37,6 +37,8 @@ def parse_args(argv):
                         help="Algorithm for clustering analysis")
     parser.add_argument("-n", dest="nclusters", action="store", required = False, type=float,
                         help="Number of clusters for Kmeans algorithm")
+    parser.add_argument("--nmax", dest="nmaxclusters", action="store", required=False, type=int,
+                        help="Perform inertia analysis using nmax clusters at most")
     parser.add_argument("--3D", dest="D3", action="store_true", default=False,
                         help="Plot 3D projections of the data")
     parser.add_argument("--all", dest="all", action="store_true", default=False,
@@ -168,6 +170,19 @@ def dbscan_clustering(X, var):
     db.fit(X)
     return db
 
+
+def n_clusters_analysis(X, nmax = 10, nmin = 2):
+    global prj
+    from sklearn.cluster import KMeans
+
+    inertia = []
+    for n in range(nmin, nmax + 1):
+        log.info("fitting %d clusters to data" % n)
+        km = KMeans(n_clusters = n).fit(X)
+        inertia.append(km.inertia_)
+    views.plot_intertia(prj, range(nmin, nmax + 1), inertia)
+
+
 def action_explore(argc, argv):
     global prj, nrows, ncols, attributes
 
@@ -226,25 +241,33 @@ def action_explore(argc, argv):
         log.info("computing features stats")
         print_stats_table(X)
 
+    inertia = False
     if args.cluster:
         if args.cluster_alg == 'kmeans':
             cluster_alg = kmeans_clustering
             if not args.nclusters:
                 args.nclusters = len(set(np.argmax(y, axis=1)))
             args.nclusters = int(args.nclusters)
-            log.info("computing kmeans clustering with k=%d" % args.nclusters)
+            if args.nmaxclusters:
+                log.info("performing inertia analysis with clusters in the range (%d, %d)" % (args.nclusters, args.nmaxclusters))
+                inertia = True
+                n_clusters_analysis(X, args.nmaxclusters, args.nclusters)
+            else:
+                log.info("computing kmeans clustering with k=%d" % args.nclusters)
         elif args.cluster_alg == 'dbscan':
             cluster_alg = dbscan_clustering
             if not args.nclusters:
                 args.nclusters = 2
             log.info("computing dbscan clustering with eps=%f" % args.nclusters)
-        if not args.pca:
+            if args.nmaxclusters:
+                log.warning("nmax specified but not used. Inertia analysis only available for Kmeans.")
+        if not args.pca and not inertia:
             log.info("computing pca to plot clusters")
             pca = calculate_pca(X)
-
-        ca = cluster_alg(X, args.nclusters)
-        views.plot_clusters(prj, pca, X, y, ca, False)
-        if args.D3:
-            views.plot_clusters(prj, pca, X, y, ca, args.D3)
+        if not inertia:
+            ca = cluster_alg(X, args.nclusters)
+            views.plot_clusters(prj, pca, X, y, ca, False)
+            if args.D3:
+                views.plot_clusters(prj, pca, X, y, ca, args.D3)
 
     views.show(args.img_only)
