@@ -31,7 +31,6 @@ from ergo.actions.serve import action_serve
 from ergo.actions.to_fdeep import action_to_fdeep
 from ergo.actions.to_tf import action_to_tf
 from ergo.actions.explore import action_explore
-from ergo.actions.prepare import action_prepare
 
 def get_pad(l):
     pad = 0
@@ -62,7 +61,6 @@ ACTIONS = collections.OrderedDict([
     ("clean", Action("clean", "Clean a project from temporary datasets and optionally reset it to its initial state.", action_clean)),
     ("view", Action("view", "View the model struture and training statistics.", action_view)),
     ("cmp", Action("cmp", "Compare the performances of two models against a given dataset.", action_compare)),
-    ("prepare", Action("prepare", "Run prepare and save datasets without running training.", action_prepare)),
     ("relevance", Action("relevance", "Compute the relevance of each feature of the dataset by differential evaluation.", action_relevance)),
     ("serve", Action("serve", "Load a model and expose an API that can be used to run its inference.", action_serve)),
     ("to-fdeep", Action("to-fdeep", "Convert the model inside an ergo project to the frugally-deep library format.", action_to_fdeep)),
