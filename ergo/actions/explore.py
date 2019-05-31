@@ -43,6 +43,9 @@ def parse_args(argv):
                         help="Plot 3D projections of the data")
     parser.add_argument("--all", dest="all", action="store_true", default=False,
                         help="Process all capabilities of ergo explore (can be time consuming deppending on dataset")
+    parser.add_argument("-w", "--workers", dest="workers", action="store", type=int, default=0,
+                        help="If 0, all the algorithms will run a single thread. Otherwise all algorithms will use w number of jobs"+ \
+                             "to distribute the computation among, -1 to use the number of logical CPU cores available.")
     return parser.parse_args(argv)
 
 def red(s):
@@ -50,7 +53,6 @@ def red(s):
 
 def terminal(s):
     return s
-
 
 def get_attributes(filename, ncols):
     attributes = []
@@ -67,6 +69,7 @@ prj = None
 ncols = 0
 nrows = 0
 attributes = None
+n_jobs = 1
 
 
 def compute_correlations_with_target (X,y):
@@ -158,33 +161,35 @@ def print_stats_table(X):
 
 
 def kmeans_clustering(X, n_clusters):
+    global n_jobs
     from sklearn.cluster import KMeans
-    km = KMeans(n_clusters = n_clusters)
+    km = KMeans(n_clusters = n_clusters, n_jobs=n_jobs)
     km.fit(X)
     return km
 
 
 def dbscan_clustering(X, var):
+    global n_jobs
     from sklearn.cluster import DBSCAN
-    db = DBSCAN(var, min_samples=100)
+    db = DBSCAN(var, min_samples=10, n_jobs=n_jobs)
     db.fit(X)
     return db
 
 
 def n_clusters_analysis(X, nmax = 10, nmin = 2):
-    global prj
+    global prj, n_jobs
     from sklearn.cluster import KMeans
 
     inertia = []
     for n in range(nmin, nmax + 1):
         log.info("fitting %d clusters to data" % n)
-        km = KMeans(n_clusters = n).fit(X)
+        km = KMeans(n_clusters = n, n_jobs=n_jobs).fit(X)
         inertia.append(km.inertia_)
     views.plot_intertia(prj, range(nmin, nmax + 1), inertia)
 
 
 def action_explore(argc, argv):
-    global prj, nrows, ncols, attributes
+    global prj, nrows, ncols, attributes, n_jobs
 
     args     = parse_args(argv)
 
@@ -194,6 +199,13 @@ def action_explore(argc, argv):
         args.stats = True
         args.cluster = True
         args.D3 = True
+
+    if args.workers == -1:
+        import multiprocessing
+        n_jobs = multiprocessing.cpu_count()
+    elif args.workers != 0:
+        n_jobs = args.workers
+    log.info("using %d workers" % n_jobs)
 
     if args.nclusters and not args.cluster:
         log.warning("number of clusters specified but clustering won't be perfomed")
