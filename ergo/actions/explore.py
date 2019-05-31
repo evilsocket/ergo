@@ -266,6 +266,9 @@ def action_explore(argc, argv):
             pca = calculate_pca(X)
         if not inertia:
             ca = cluster_alg(X, args.nclusters)
+            if len(set(ca.labels_)) == 1:
+                log.error("clustering failed. Check input parameter.")
+                quit()
             views.plot_clusters(prj, pca, X, y, ca, False)
             if args.D3:
                 views.plot_clusters(prj, pca, X, y, ca, args.D3)
