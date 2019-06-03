@@ -44,7 +44,7 @@ def parse_args(argv):
     parser.add_argument("--all", dest="all", action="store_true", default=False,
                         help="Process all capabilities of ergo explore (can be time consuming deppending on dataset")
     parser.add_argument("-w", "--workers", dest="workers", action="store", type=int, default=0,
-                        help="If 0, all the algorithms will run a single thread. Otherwise all algorithms will use w number of jobs"+ \
+                        help="If 0, all the algorithms will run a single thread. Otherwise all algorithms will use w number of jobs "+ \
                              "to distribute the computation among, -1 to use the number of logical CPU cores available.")
     return parser.parse_args(argv)
 
