@@ -78,7 +78,8 @@ Explore can show:
 4. [PCA decomposition](https://en.wikipedia.org/wiki/Principal_component_analysis): 
     * 2D projection of the data based on classes.
     * Explained variance of each principal component with 90, 95 and 99 % explanation values.    
-5. [Kmeans clustering](https://en.wikipedia.org/wiki/K-means_clustering) of the data
+5. [Kmeans clustering](https://en.wikipedia.org/wiki/K-means_clustering) or [DBSCAN clustering](https://en.wikipedia.org/wiki/DBSCAN) of the data.
+6. [Elbow method](https://en.wikipedia.org/wiki/Elbow_method_(clustering)) to determine the optimal number of clusters for kmeans.
 
 Example with a dataset `some/path/data.csv`: 
 
