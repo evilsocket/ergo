@@ -110,6 +110,12 @@ def calculate_corr(X):
     global attributes
     return pd.DataFrame(np.corrcoef(X, rowvar=False), columns=attributes, index=attributes)
 
+def is_in_table(table, entry):
+    for row in table:
+        if row[1] == entry[0] and row[0] == entry[1]:
+            return True
+    return False
+
 
 def print_correlation_table(corr, min_corr=0.6):
     abs_corr = corr.abs().unstack()
@@ -120,7 +126,7 @@ def print_correlation_table(corr, min_corr=0.6):
             continue
         if sorted_corr.loc[idx] <= min_corr:
             break
-        if (idx[1], idx[0], sorted_corr.loc[idx]) in table:
+        if is_in_table(table, idx):
             continue
         table.append(( idx[0], idx[1], "%.3f" % sorted_corr.loc[idx]))
     print("")
