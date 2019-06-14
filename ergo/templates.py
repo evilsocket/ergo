@@ -67,7 +67,7 @@ def train_model(model, dataset):
             len(dataset.Y_train), 
             len(dataset.Y_val) ) )
     
-    loss      = 'binary_crossentropy'
+    loss      = 'categorical_crossentropy'
     optimizer = 'adam'
     metrics   = ['accuracy']
     
