@@ -14,20 +14,38 @@ num_outputs = 0
 app         = Flask(__name__)
 
 def get_input(req):
-    # search in query parameters
-    x = request.args.get('x')
-    if x is not None and x != "":
-        return x
+    try:
+        # search in query parameters
+        x = request.args.get('x')
+        if x is not None and x != "":
+            return x
+    except:
+        pass
 
-    # search in form body
-    x = request.form.get('x')
-    if x is not None and x != "":
-        return x
+    try:
+        # search in form body
+        x = request.form.get('x')
+        if x is not None and x != "":
+            return x
+    except:
+        pass
 
-    # search as file upload
-    x = request.files['x']
-    if x is not None:
-        return x
+
+    try:
+        # search as file upload
+        x = request.files['x']
+        if x is not None:
+            return x
+    except:
+        pass
+
+    try:
+        # search for direct json body
+        x = req.get_json(silent=True)
+        if x is not None:
+            return x
+    except:
+        pass
 
     return None
 
@@ -49,7 +67,6 @@ def encode_route():
 @app.route('/', methods=['POST', 'GET'])
 def infer_route():
     global prj, classes, num_outputs
-
     try:
         xin = get_input(request)
         if xin is None:
@@ -114,7 +131,6 @@ def action_serve(argc, argv):
         if prj.classes is None:
             classes = ["class_%d" % i for i in range(num_outputs)]
         else:
-            print(prj.classes)
             classes = [prj.classes[i] for i in range(num_outputs)]
     else:
         classes = [s.strip() for s in args.classes.split(',') if s.strip() != ""]
