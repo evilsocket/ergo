@@ -78,7 +78,7 @@ class Dataset(object):
             self.is_flat = False
             self.train_path = self.train_path.replace('.csv', '.pkl')
             self.test_path = self.test_path.replace('.csv', '.pkl')
-            self.test_path = self.test_path.replace('.csv', '.pkl')
+            self.valid_path = self.valid_path.replace('.csv', '.pkl')
 
     def load_test(self):
         self._check_encoding()
