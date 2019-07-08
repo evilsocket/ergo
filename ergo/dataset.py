@@ -53,7 +53,7 @@ class Dataset(object):
         return os.path.exists(self.test_path) or os.path.exists(self.test_path.replace('.csv', '.pkl'))
 
     def has_validation(self):
-        return os.path.exists(self.valid_path) or os.path.exists(self.validation_path.replace('.csv', '.pkl'))
+        return os.path.exists(self.valid_path) or os.path.exists(self.valid_path.replace('.csv', '.pkl'))
 
     def exists(self):
         return self.has_train() and \
@@ -116,6 +116,9 @@ class Dataset(object):
 
         # count unique labels on first column
         self.n_labels = len(dataset.iloc[:,0].unique())
+        print("labels : ", self.n_labels)
+        self.n_labels = max(dataset.iloc[:,0]) + 1
+        print("labels : ", self.n_labels)
         # if both values are zero, we're just loading a single file,
         # otherwise we want to generate training temporary datasets.
         for_training = p_test > 0.0 and p_val > 0.0
