@@ -9,33 +9,39 @@ from terminaltables import AsciiTable
 
 from ergo.project import Project
 
+
 def parse_args(argv):
-    parser = argparse.ArgumentParser(prog="ergo cmp", description="Compare the performances of two models against a given dataset.",
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(prog="ergo cmp",
+                                     description="Compare the performances of two models against a given dataset.",
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument("path_1", help="Path of the first project to compare.")
     parser.add_argument("path_2", help="Path of the second project to compare.")
 
     parser.add_argument("-d", "--dataset", dest="dataset", action="store", type=str, required=True,
-        help="The dataset file to use to compare the models.")
+                        help="The dataset file to use to compare the models.")
     parser.add_argument("-j", "--to-json", dest="to_json", action="store", type=str, required=False,
-        help="Output the comparision results to this json file.")
+                        help="Output the comparision results to this json file.")
 
     args = parser.parse_args(argv)
     return args
 
+
 def red(s):
     return "\033[31m" + s + "\033[0m"
 
+
 def green(s):
     return "\033[32m" + s + "\033[0m"
+
 
 # https://stackoverflow.com/questions/11942364/typeerror-integer-is-not-json-serializable-when-serializing-json-in-python
 def default(o):
     if isinstance(o, np.int64): return int(o)
     raise TypeError
 
-def generate_reduced_dataset(dataset, size = 10):
+
+def generate_reduced_dataset(dataset, size=10):
     temp_name = next(tempfile._get_candidate_names())
     tmpfile = open(temp_name, 'w')
     count = 0
@@ -46,8 +52,8 @@ def generate_reduced_dataset(dataset, size = 10):
     size = max(count // 100, size)
     log.info("creating temporary dataset %s of size %d", temp_name, size)
 
-    with open(dataset,'r') as inpfile:
-        p = float(size)/ count
+    with open(dataset, 'r') as inpfile:
+        p = float(size) / count
         # assuming header:
         tmpfile.write(inpfile.readline())
         for i in inpfile:
@@ -56,6 +62,7 @@ def generate_reduced_dataset(dataset, size = 10):
                 tmpfile.write(line)
     tmpfile.close()
     return temp_name
+
 
 def are_preparation_equal(projects, dataset):
     inp_shape = None
@@ -71,20 +78,20 @@ def are_preparation_equal(projects, dataset):
 def compare_datasets(ds1, ds2):
     if ds1.is_flat:
         return np.array_equal(ds1.X, ds2.X)
-    for i,j in zip(ds1.X, ds2.X):
+    for i, j in zip(ds1.X, ds2.X):
         if not np.array_equal(i, j):
             return False
     return True
 
 
 def action_compare(argc, argv):
-    args     = parse_args(argv)
-    metrics  = {}
+    args = parse_args(argv)
+    metrics = {}
     projects = { \
         args.path_1: None,
         args.path_2: None,
     }
-    ref       = None
+    ref = None
     inp_shape = None
     out_shape = None
     is_prepared = None
@@ -111,7 +118,7 @@ def action_compare(argc, argv):
             quit()
         projects[path] = prj
 
-    for prj,path in zip(prjs, projects):
+    for prj, path in zip(prjs, projects):
         prj = Project(path)
         err = prj.load()
 
@@ -126,14 +133,14 @@ def action_compare(argc, argv):
         else:
             if are_equal:
                 log.info("Projects use same prepare.py file ...")
-                prj.dataset.X, prj.dataset.Y = ref.dataset.X.copy(), ref.dataset.Y.copy()
+                prj.dataset.X, prj.dataset.Y, prj.dataset.n_labels = ref.dataset.X.copy(), ref.dataset.Y.copy(), ref.dataset.n_labels
             else:
                 log.info("Projects use different prepare.py files, reloading dataset ...")
                 prj.prepare(args.dataset, 0., 0., False)
 
         # TODO: Run in parallel?
         log.debug("running %s ...", path)
-        metrics[path] = prj.accuracy_for(prj.dataset.X, prj.dataset.Y, repo_as_dict = True)
+        metrics[path] = prj.accuracy_for(prj.dataset.X, prj.dataset.Y, repo_as_dict=True)
 
     prev = None
     for path, m in metrics.items():
@@ -144,27 +151,27 @@ def action_compare(argc, argv):
         ref_repo, ref_cm = prev
         new_repo, new_cm = m
         diffs = {
-            'report':[],
-            'cm':[],
-            'cm_stats':{}
+            'report': [],
+            'cm': [],
+            'cm_stats': {}
         }
 
-        table = [ ["Name", "Ref", "New", "Delta"] ]
+        table = [["Name", "Ref", "New", "Delta"]]
         for label, ref_run in ref_repo.items():
             for name, ref_value in ref_run.items():
                 new_value = new_repo[label][name]
                 if new_value != ref_value:
                     delta = new_value - ref_value
-                    sign, fn  = ('+', green) if delta >= 0 else ('', red)
+                    sign, fn = ('+', green) if delta >= 0 else ('', red)
                     diffs['report'].append({
                         'name': '%s / %s' % (label, name),
                         'delta': delta,
                     })
-                    table.append( [\
+                    table.append([ \
                         "%s / %s" % (label, name),
                         "%.2f" % ref_value,
                         "%.2f" % new_value,
-                        fn("%s%.2f" % (sign, delta))] )
+                        fn("%s%.2f" % (sign, delta))])
         print("")
         print(AsciiTable(table).table)
 
@@ -172,10 +179,10 @@ def action_compare(argc, argv):
         for i in range(0, ref_cm.shape[0]):
             heads.append("class %d" % i)
 
-        table = [ heads ]
+        table = [heads]
         total = 0
-        impr  = 0
-        regr  = 0
+        impr = 0
+        regr = 0
         for i in range(0, ref_cm.shape[0]):
             row = ["class %d" % i]
             row_diffs = []
@@ -186,7 +193,7 @@ def action_compare(argc, argv):
                 delta = new_v - ref_v
 
                 if ref_v != new_v:
-                    sign  = '+' if delta >= 0 else ''
+                    sign = '+' if delta >= 0 else ''
 
                     if i == j:
                         fn = green if delta >= 0 else red
