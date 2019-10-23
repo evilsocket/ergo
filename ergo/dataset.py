@@ -99,7 +99,7 @@ class Dataset(object):
         except:
             raise
 
-    def source(self, data, p_test = 0.0, p_val = 0.0, shuffle = True):
+    def source(self, data, p_test = 0.0, p_val = 0.0, shuffle = True, n_labels=None):
         if shuffle:
             # reset indexes and resample data just in case
             dataset = data.sample(frac = 1).reset_index(drop = True)
@@ -114,8 +114,8 @@ class Dataset(object):
                 self.is_flat = False
                 break
 
-        # count unique labels on first column
-        self.n_labels = len(dataset.iloc[:,0].unique())
+        # count unique labels on first column if no counter is provided externally
+        self.n_labels = n_labels if n_labels is not None else len(dataset.iloc[:,0].unique())
         # if both values are zero, we're just loading a single file,
         # otherwise we want to generate training temporary datasets.
         for_training = p_test > 0.0 and p_val > 0.0

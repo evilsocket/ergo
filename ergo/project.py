@@ -147,8 +147,12 @@ class Project(object):
 
     def prepare(self, source, p_test, p_val, shuffle = True):
         data = self._from_file(source)
+        num_labels = None
+        if self.model is not None:
+            # assuming only one single dense output layer
+            num_labels = self.model.outputs[-1].shape[1]
         log.info("data shape: %s", data.shape)
-        return self.dataset.source(data, p_test, p_val, shuffle)
+        return self.dataset.source(data, p_test, p_val, shuffle, num_labels)
 
     def train(self, gpus):
         # async datasets saver might be running, wait before training
