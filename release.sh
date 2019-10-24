@@ -9,7 +9,8 @@ read NEW_VERSION
 echo "Creating version $NEW_VERSION ...\n"
 
 echo "Patching ${VERSION_FILE} ..."
-sed -i "s/$CURRENT_VERSION/$NEW_VERSION/g" "${VERSION_FILE}"
+sed -i.bak "s/$CURRENT_VERSION/$NEW_VERSION/g" "${VERSION_FILE}"
+rm -rf "$file.bak"
 git add "${VERSION_FILE}"
 
 git commit -m "Releasing v$NEW_VERSION"
