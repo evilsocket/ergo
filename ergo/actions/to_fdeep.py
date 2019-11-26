@@ -741,7 +741,7 @@ def calculate_hash(model):
     return hash_m.hexdigest()
 
 
-def convert(in_path, out_path, no_tests=False):
+def convert(in_path, out_path, no_tests=False, metadata=None):
     """Convert any Keras model to the frugally-deep model format."""
 
     assert K.backend() == "tensorflow"
@@ -761,6 +761,10 @@ def convert(in_path, out_path, no_tests=False):
     test_data = None if no_tests else gen_test_data(model)
 
     json_output = {}
+    if metadata is not None:
+        with open(metadata, 'r') as metadata_file:
+            meta_info = json.load(metadata_file)
+        json_output.update(meta_info)
     json_output['architecture'] = json.loads(model.to_json())
 
     json_output['image_data_format'] = K.image_data_format()
@@ -797,6 +801,8 @@ def parse_args(argv):
     parser.add_argument("path", help="Path of the project containing the model.")
     parser.add_argument("--no-tests", dest="no_tests", action="store_true", default=False,
             help="Don't generate tests in fdeep")
+    parser.add_argument("--metadata", dest="metadata", action="store", required=False,
+            help="Add metadata to fdeep model (json file)")
     args = parser.parse_args(argv)
     return args
 
@@ -811,5 +817,5 @@ def action_to_fdeep(argc, argv):
         log.error("no trained model found for this project")
         quit()
 
-    convert(prj.weights_path, prj.fdeep_path, args.no_tests)
+    convert(prj.weights_path, prj.fdeep_path, args.no_tests, args.metadata)
 
