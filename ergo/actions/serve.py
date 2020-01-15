@@ -1,6 +1,7 @@
 import os
 import argparse
 import traceback
+import threading
 import logging as log
 import pandas as pd
 import numpy as np
@@ -8,6 +9,8 @@ from flask import Flask, request, jsonify
 
 from ergo.project import Project
 
+reqs        = 0
+reload_lock = threading.Lock()
 prj         = None
 classes     = None
 num_outputs = 0
@@ -66,27 +69,33 @@ def encode_route():
 
 @app.route('/', methods=['POST', 'GET'])
 def infer_route():
-    global prj, classes, num_outputs
+    global reqs, reload_lock, prj, classes, num_outputs
     try:
         xin = get_input(request)
         if xin is None:
             return "missing 'x' parameter", 400
 
-        # encode the input
-        x = prj.logic.prepare_input(xin)
-        # run inference
-        y = prj.model.predict(np.array([x]))[0].tolist()
-        # decode results
-        num_y = len(y)
-        resp = {}
+        with reload_lock:
+            # encode the input
+            x = prj.logic.prepare_input(xin)
+            # run inference
+            y = prj.model.predict(np.array([x]))[0].tolist()
+            # decode results
+            num_y = len(y)
+            resp = {}
 
-        if num_y != num_outputs:
-            return "expected %d output classes, got inference with %d results" % (num_outputs, num_y), 500
+            if num_y != num_outputs:
+                return "expected %d output classes, got inference with %d results" % (num_outputs, num_y), 500
 
-        resp = { classes[i] : y[i] for i in range(num_y) }
+            resp = { classes[i] : y[i] for i in range(num_y) }
+            reqs += 1
+            if reqs >= 25:
+                prj.reload_model()
+                reqs = 0
 
         return jsonify(resp), 200
     except Exception as e:
+        log.exception("error while running inference")
         return str(e), 400
 
 def parse_args(argv):

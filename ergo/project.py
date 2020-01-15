@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import re
+import gc
 import logging as log
 
 import numpy as np
@@ -11,6 +12,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 from keras.models import model_from_yaml, load_model
 from keras.utils.training_utils import multi_gpu_model
+from keras import backend as K
 
 from ergo.core.utils import serialize_classification_report, serialize_cm
 from ergo.core.logic import Logic
@@ -98,6 +100,21 @@ class Project(object):
                 'test': (test, ts_cm),
                 'val': (val, val_cm)}
 
+    def reload_model(self):
+        K.clear_session()
+
+        if os.path.exists(self.weights_path):
+            self.model = load_model(self.weights_path)
+            # https://github.com/keras-team/keras/issues/6462
+            self.model._make_predict_function()
+        elif os.path.exists(self.model_path):
+            with open(self.model_path, 'r') as fp:
+                self.model = model_from_yaml(fp.read())
+        else:
+            self.model = self.logic.builder(True)
+
+        gc.collect()
+
     def _save_model(self):
         log.info("updating %s ...", self.model_path)
         with open( self.model_path, 'w' ) as fp:
@@ -126,8 +143,8 @@ class Project(object):
         stats = {}
         for who in self.what:
             report, cm = self.accu[who]
-            stats[who] = { 
-                'accuracy': serialize_classification_report(report), 
+            stats[who] = {
+                'accuracy': serialize_classification_report(report),
                 'cm': serialize_cm(cm)
             }
         json.dump(stats, where)
@@ -188,7 +205,7 @@ class Project(object):
         self._save_history()
         # save model accuracy statistics
         self._save_stats()
-          
+
     def view(self, img_only = False):
         import ergo.views as views
 
