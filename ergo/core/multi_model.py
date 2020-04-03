@@ -4,7 +4,7 @@ class multi_model():
         self.cpu_model = cpu_model
         self.gpu_model = gpu_model
 
-    def fit (self, x, y, **kwargs):
+    def fit (self, x=x, y=y, **kwargs):
         return self.gpu_model.fit(x, y, **kwargs)
 
     def compile(self, **kwargs):
