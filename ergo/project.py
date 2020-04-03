@@ -17,6 +17,7 @@ from keras import backend as K
 from ergo.core.utils import serialize_classification_report, serialize_cm
 from ergo.core.logic import Logic
 from ergo.dataset import Dataset
+from ergo.core.multi_model import multi_model
 
 class Project(object):
     def __init__(self, path):
@@ -182,7 +183,7 @@ class Project(object):
         to_train = self.model
         if gpus > 1:
             log.info("training with %d GPUs", gpus)
-            to_train = multi_gpu_model(self.model, gpus=gpus)
+            to_train = multi_model(self.model, multi_gpu_model(self.model, gpus=gpus))
 
         past = self.history.copy() if self.history is not None else None
         present = self.logic.trainer(to_train, self.dataset).history
