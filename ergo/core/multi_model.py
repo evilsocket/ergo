@@ -13,6 +13,6 @@ class multi_model():
     def __getattr__(self, name, *args, **kwargs):
         if hasattr(self.cpu_model, name):
             def wrapper(*args, **kwargs):
-                return getattr(self.cpu_model, name)(*args)
+                return getattr(self.cpu_model, name)(*args, **kwargs)
             return wrapper
         raise AttributeError("Method/Attribute %s not found for keras model" % name)
