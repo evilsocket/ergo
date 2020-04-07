@@ -180,7 +180,7 @@ class Project(object):
         if self.model is None:
             self.model = self.logic.builder(True)
 
-        to_train = self.model
+        to_train = multi_model(self.model, None)
         if gpus > 1:
             log.info("training with %d GPUs", gpus)
             to_train = multi_model(self.model, multi_gpu_model(self.model, gpus=gpus))
