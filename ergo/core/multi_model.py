@@ -5,10 +5,14 @@ class multi_model():
         self.gpu_model = gpu_model
 
     def fit (self, x, y, **kwargs):
-        return self.gpu_model.fit(x, y, **kwargs)
+        if self.gpu_model is not None:
+            return self.gpu_model.fit(x, y, **kwargs)
+        return self.cpu_model.fit(x,y, **kwargs)
 
     def compile(self, **kwargs):
-        return self.gpu_model.compile(**kwargs)
+        if self.gpu_model is not None:
+            return self.gpu_model.compile(**kwargs)
+        return self.cpu_model.compile(**kwargs)
 
     def __getattr__(self, name, *args, **kwargs):
         if hasattr(self.cpu_model, name):
