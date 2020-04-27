@@ -89,7 +89,7 @@ class Project(object):
 
     def accuracy_for(self, X, Y, repo_as_dict = False):
         Y_tpred = np.argmax(self.model.predict(X), axis = 1)
-        repo    = classification_report(np.argmax(Y, axis = 1), Y_tpred, output_dict = repo_as_dict)
+        repo    = classification_report(np.argmax(Y, axis = 1), Y_tpred, output_dict = repo_as_dict, digits = 5)
         cm      = confusion_matrix(np.argmax(Y, axis = 1), Y_tpred)
         return repo, cm
 
