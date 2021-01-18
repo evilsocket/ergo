@@ -8,11 +8,11 @@ import json
 import sys
 import argparse
 
-import keras
+import tensorflow.keras as keras
 import numpy as np
-from keras import backend as K
-from keras.layers import Input
-from keras.models import Model, load_model
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Input
+from tensorflow.keras.models import Model, load_model
 
 import logging as log
 from ergo.project import Project
