@@ -1,8 +1,9 @@
 tensorflow>2
 pandas
-sklearn==0.20.0
+sklearn
 pydot
 matplotlib
 flask
 terminaltables
 seaborn
+yaml
