@@ -10,9 +10,9 @@ import pandas as pd
 
 from sklearn.metrics import classification_report, confusion_matrix
 
-from keras.models import model_from_yaml, load_model
-from keras.utils.training_utils import multi_gpu_model
-from keras import backend as K
+from tensorflow.keras.models import model_from_yaml, load_model
+from tensorflow.keras.utils.training_utils import multi_gpu_model
+from tensorflow.keras import backend as K
 
 from ergo.core.utils import serialize_classification_report, serialize_cm
 from ergo.core.logic import Logic
