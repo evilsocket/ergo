@@ -64,7 +64,7 @@ class Project(object):
             log.debug("loading model from %s ...", self.weights_path)
             self.model = load_model(self.weights_path)
             # https://github.com/keras-team/keras/issues/6462
-            self.model._make_predict_function()
+            self.model.make_predict_function()
 
         elif os.path.exists(self.model_path):
             log.debug("loading model from %s ...", self.model_path)
