@@ -6,4 +6,4 @@ matplotlib
 flask
 terminaltables
 seaborn
-yaml
+pyyaml
