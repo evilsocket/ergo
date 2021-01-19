@@ -182,18 +182,22 @@ class Project(object):
             physical_devices = tf.config.list_physical_devices('GPU')
             tf.config.set_visible_devices(physical_devices[ 0:gpus ], 'GPU')
             strategy = tf.distribute.MirroredStrategy()
-            with strategy.scope():
-                to_train = multi_model(self.model, multi_gpu_model(self.model, gpus=gpus))
 
         with strategy.scope():
             # train
             if self.model is None:
                 self.model = self.logic.builder(True)
+            to_train = multi_model(self.model, None)
 
-        to_train = multi_model(self.model, None)
+        if gpus > 1:
+            with strategy.scope():
+                to_train = multi_model(self.model, multi_gpu_model(self.model, gpus=gpus))
+
 
         past = self.history.copy() if self.history is not None else None
-        present = self.logic.trainer(to_train, self.dataset, strategy).history
+
+        with strategy.scope():
+            present = self.logic.trainer(to_train, self.dataset, strategy).history
 
         if past is None:
             self.history = present
