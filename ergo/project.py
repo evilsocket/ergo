@@ -4,7 +4,7 @@ import json
 import re
 import gc
 import logging as log
-
+import tensorflow as tf
 import numpy as np
 import pandas as pd
 
@@ -70,9 +70,6 @@ class Project(object):
             log.debug("loading model from %s ...", self.model_path)
             with open(self.model_path, 'r') as fp:
                 self.model = model_from_yaml(fp.read())
-
-        else:
-            self.model = self.logic.builder(True)
 
         if os.path.exists(self.history_path):
             log.debug("loading history from %s ...", self.history_path)
@@ -176,17 +173,27 @@ class Project(object):
         # async datasets saver might be running, wait before training
         self.dataset.saver.wait()
 
-        # train
-        if self.model is None:
-            self.model = self.logic.builder(True)
-
-        to_train = multi_model(self.model, None)
+        strategy = tf.distribute.MirroredStrategy()
         if gpus > 1:
             log.info("training with %d GPUs", gpus)
-            to_train = multi_model(self.model, multi_gpu_model(self.model, gpus=gpus))
+            physical_devices = tf.config.list_physical_devices('GPU')
+            tf.config.set_visible_devices(physical_devices[ 0:gpus ], 'GPU')
+            strategy = tf.distribute.MirroredStrategy()
+
+        with strategy.scope():
+            # train            
+            if self.model is None:
+                self.model = self.logic.builder(True)
+            to_train = multi_model(self.model, None)
+
+        if gpus > 1:
+            with strategy.scope():
+                to_train = multi_model(self.model, multi_gpu_model(self.model, gpus=gpus))
+
 
         past = self.history.copy() if self.history is not None else None
-        present = self.logic.trainer(to_train, self.dataset).history
+        with strategy.scope():
+            present = self.logic.trainer(to_train, self.dataset).history
 
         if past is None:
             self.history = present
