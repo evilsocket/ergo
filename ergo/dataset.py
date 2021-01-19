@@ -4,7 +4,7 @@ import logging as log
 import numpy as np
 import pandas as pd
 
-from keras.utils import to_categorical
+from tensorflow.keras.utils import to_categorical
 
 from ergo.core.saver import Saver
 from ergo.core.loader import Loader

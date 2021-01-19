@@ -3,9 +3,9 @@ import json
 import sys
 stderr = sys.stderr
 sys.stderr = open('/dev/null', 'w')
-import keras
+import tensorflow.keras as keras
 import sklearn
-sys.stderr = stderr 
+sys.stderr = stderr
 
 import tensorflow as tf
 from tensorflow.python.client import device_lib
@@ -66,8 +66,8 @@ def action_info(argc, argv):
                 'memory': dev.memory_limit,
                 'description': dev.physical_device_desc
             })
-        
-        print(json.dumps(info)) 
+
+        print(json.dumps(info))
     else:
         print(banner.strip("\n") % (__version__, keras.__version__, tf.__version__, sklearn.__version__))
         print("")

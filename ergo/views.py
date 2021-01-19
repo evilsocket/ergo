@@ -76,8 +76,8 @@ def history(prj, img_only):
         plt.figure("training history")
         # Plot training & validation accuracy values
         plt.subplot(2,1,1)
-        plt.plot(prj.history['acc'])
-        plt.plot(prj.history['val_acc'])
+        plt.plot(prj.history['accuracy'])
+        plt.plot(prj.history['val_accuracy'])
         plt.title('Model accuracy')
         plt.ylabel('Accuracy')
         plt.xlabel('Epoch')

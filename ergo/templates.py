@@ -26,17 +26,17 @@ model = \
 """
 import logging as log
 
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation, Dropout
 
 # build the model
-def build_model(is_train):  
+def build_model(is_train):
     n_inputs       = {NUM_INPUTS}
     n_hidden       = [{HIDDEN}]
     dropout        = 0.4
     activation     = 'relu'
     out_activation = 'softmax'
-  
+
     log.info("building model for %s ..." % 'training' if is_train else 'evaluation')
 
     model = Sequential()
@@ -51,7 +51,7 @@ def build_model(is_train):
             model.add(Dropout(dropout))
     # setup output layer
     model.add(Dense({NUM_OUTPUTS}, activation = out_activation))
-    
+
     return model
 """
 
@@ -59,18 +59,18 @@ train = \
 """
 import logging as log
 
-from keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping
 
 # define training strategy
 def train_model(model, dataset):
     log.info("training model (train on %d samples, validate on %d) ..." % ( \\
-            len(dataset.Y_train), 
+            len(dataset.Y_train),
             len(dataset.Y_val) ) )
-    
+
     loss      = 'categorical_crossentropy'
     optimizer = 'adam'
     metrics   = ['accuracy']
-    
+
     model.compile(loss = loss, optimizer = optimizer, metrics = metrics)
 
     earlyStop = EarlyStopping(monitor = 'val_acc', min_delta=0.0001, patience = 5, mode = 'auto')
@@ -94,7 +94,7 @@ gitignore = \
 __pycache__
 """
 
-Templates = [ 
+Templates = [
     Template('prepare.py', prepare),
     Template('model.py', model),
     Template('train.py', train),

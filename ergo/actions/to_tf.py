@@ -4,7 +4,7 @@ import os
 import argparse
 
 import tensorflow as tf
-from keras import backend as K
+from tensorflow.keras import backend as K
 
 import logging as log
 
