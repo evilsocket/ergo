@@ -4,7 +4,7 @@ import json
 import re
 import gc
 import logging as log
-
+import tensorflow as tf
 import numpy as np
 import pandas as pd
 
@@ -70,9 +70,6 @@ class Project(object):
             log.debug("loading model from %s ...", self.model_path)
             with open(self.model_path, 'r') as fp:
                 self.model = model_from_yaml(fp.read())
-
-        else:
-            self.model = self.logic.builder(True)
 
         if os.path.exists(self.history_path):
             log.debug("loading history from %s ...", self.history_path)
@@ -184,7 +181,7 @@ class Project(object):
             strategy = tf.distribute.MirroredStrategy()
 
         with strategy.scope():
-            # train
+            # train            
             if self.model is None:
                 self.model = self.logic.builder(True)
             to_train = multi_model(self.model, None)
@@ -195,9 +192,8 @@ class Project(object):
 
 
         past = self.history.copy() if self.history is not None else None
-
         with strategy.scope():
-            present = self.logic.trainer(to_train, self.dataset, strategy).history
+            present = self.logic.trainer(to_train, self.dataset).history
 
         if past is None:
             self.history = present
