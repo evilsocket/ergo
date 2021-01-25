@@ -79,7 +79,7 @@ def infer_route():
             # encode the input
             x = prj.logic.prepare_input(xin)
             # run inference
-            y = prj.model.predict(np.array([x]))[0].tolist()
+            y = prj.model.predict(np.array(x))[0].tolist()
             # decode results
             num_y = len(y)
             resp = {}
