@@ -30,7 +30,7 @@
 
 ### Enable GPU support (optional)
 
-Make sure you have [CUDA 9.0 and cuDNN 7.0 installed](https://medium.com/@zhanwenchen/install-cuda-and-cudnn-for-tensorflow-gpu-on-ubuntu-79306e4ac04e) and then:
+Make sure you have [CUDA 11 and cuDNN 8.0 installed](https://medium.com/@zhanwenchen/install-cuda-and-cudnn-for-tensorflow-gpu-on-ubuntu-79306e4ac04e) and then:
 
     sudo pip3 uninstall tensorflow
     sudo pip3 install tensorflow-gpu
